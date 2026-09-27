@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { InvitationPage } from "@/components/invitation/invitation-page";
-import { Reveal, Section, SectionLabel } from "@/components/invitation/primitives";
+import { RsvpSection } from "@/components/invitation/rsvp-section";
 import { getGuestByToken, getWedding } from "@/lib/data";
 import { coupleTitle } from "@/lib/utils/wedding";
 
@@ -34,23 +34,7 @@ export default async function InvitePage(props: PageProps<"/invite/[token]">) {
     <InvitationPage
       wedding={wedding}
       guestName={guest.name}
-      rsvpSlot={
-        <Section className="border-t border-beige">
-          <Reveal className="flex flex-col items-center text-center">
-            <SectionLabel>Katılım</SectionLabel>
-            <p className="mt-10 font-display text-3xl font-light text-charcoal sm:text-4xl">
-              Aramızda olacak mısınız?
-            </p>
-            <p className="mt-6 max-w-sm text-balance text-sm leading-loose text-graphite">
-              Planlamamızı yapabilmemiz için katılım durumunuzu bildirmenizi
-              rica ederiz.
-            </p>
-            <p className="mt-10 text-xs leading-relaxed text-stone">
-              RSVP formu Adım 3&rsquo;te gelecek.
-            </p>
-          </Reveal>
-        </Section>
-      }
+      rsvpSlot={<RsvpSection guest={guest} />}
     />
   );
 }
