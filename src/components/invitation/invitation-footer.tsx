@@ -5,7 +5,7 @@ import type { Wedding } from "@/types";
 /** Kapanış: monogram ve kısa bir veda satırı. */
 export function InvitationFooter({ wedding }: { wedding: Wedding }) {
   return (
-    <footer className="border-t border-beige px-6 py-20 sm:py-24">
+    <footer className="relative z-50 bg-ivory px-6 py-20 sm:py-24">
       <Reveal className="mx-auto flex max-w-xl flex-col items-center text-center">
         <p className="text-[0.7rem] tracking-[0.5em] text-gold">
           {monogram(wedding)}

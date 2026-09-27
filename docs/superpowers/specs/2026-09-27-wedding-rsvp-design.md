@@ -226,18 +226,58 @@ Client bileşen yalnızca etkileşim gerektiğinde: `Countdown`, `RSVPForm`, `Mu
 
 ## 8. Public davetiye deneyimi
 
-### Bölümler
+### Akış: yığılan kartlar
 
-1. **Hero** — tam ekran. Çift fotoğrafı, isimler (`name_order`'a göre sıralı), tarih, kısa davet cümlesi, ince scroll göstergesi.
-2. **Countdown** — client-side, `Europe/Istanbul`. Düğün tarihi geçmişse render edilmez.
-3. **Galeri** — `gallery_images` boşsa bölüm tamamen gizlenir.
-4. **Düğün detayları** — tarih (gün adıyla), saat, mekân, şehir. Altında "Yol Tarifi" butonu → `maps_url`. `maps_url` yoksa buton gizlenir.
-5. **RSVP** — yalnızca `/invite/[token]` üzerinde.
-6. **Müzik** — sabit konumda küçük toggle. Autoplay yok; kullanıcı başlatır (şartname §5). `music_url` yoksa gizlenir.
+Sayfa aşağı akan klasik bir landing page değildir. Hero tam ekran bir **kapak** olarak durur; sonrasındaki her bölüm, üst üste yığılan bir **kart**tır.
+
+Her kart `position: sticky` ile sırasına göre artan bir üst boşlukta durur:
+
+```
+top = index × başlık_yüksekliği + üst_pay
+```
+
+Bir sonraki kart üzerine kayarken öncekinin yalnızca başlık şeridi görünür kalır; ilerledikçe ekranın üstünde bir başlık destesi birikir. Referans: `tugiverse.online` sitesindeki PROJECT bölümünün akışı.
+
+**Kart anatomisi**
+
+```
+┌────────────────────────────────────┐  yuvarlak köşe, ince kenarlık
+│ ── DÜĞÜN            ( YOL TARİFİ ↗)│  başlık şeridi (yapışan kısım)
+├────────────────────────────────────┤
+│                                    │
+│            içerik                  │  min-h 62svh, dikeyde ortalı
+│                                    │
+└────────────────────────────────────┘
+```
+
+Başlık şeridi solda hairline + aralıklı büyük harf etiket, sağda opsiyonel pill bağlantı taşır. Bölümler numaralandırılmaz — numaralar portfolyoda proje sıralamak için anlamlıdır, davetiyede liste hissi verir.
+
+**Kartlar**
+
+| Kart | Etiket | Başlık eylemi | Görünürlük |
+|---|---|---|---|
+| Geri sayım | GERİ SAYIM | — | Düğün geçtiyse kaldırılır |
+| Galeri | BİZ | — | `gallery_images` boşsa oluşturulmaz |
+| Detaylar | DÜĞÜN | Yol Tarifi ↗ | `maps_url` yoksa eylem gizlenir |
+| RSVP | KATILIM | — | Her zaman; içerik sayfaya göre değişir |
+
+**Teknik notlar**
+
+- Yığılma saf CSS'tir. `CardStack` bileşeninin istemci tarafında olmasının tek nedeni, düğün geçtiğinde geri sayım kartını listeden düşürmektir — sayfa statik üretildiği için bu karar sunucuda verilemez.
+- Yapışkan öğeye `transform` uygulanmaz; `Reveal` sarmalayıcısı yalnızca kart *içeriğinde* kullanılır. Aksi halde transform yeni bir containing block oluşturur ve sticky bozulur.
+- Yapışkan öğelerin hiçbir atası `overflow: hidden` olmamalıdır.
+
+### Diğer bölümler
+
+- **Hero** — tam ekran kapak. Çift fotoğrafı veya monogram, isimler (`name_order`'a göre sıralı), tarih, kısa davet cümlesi, ince scroll göstergesi. Kişisel linkte davetli adıyla selamlama. İlk kart hero'nun altına negatif boşlukla biner.
+- **Footer** — yığının altında, monogram ve kapanış satırı.
+- **Müzik** — sabit konumda küçük toggle. Autoplay yok; kullanıcı başlatır (şartname §5). `music_url` yoksa gizlenir.
 
 ### Tasarım dili
 
-Ivory / warm-white zemin, charcoal metin, muted gold vurgu. Geniş whitespace, ince ayraç çizgileri, büyük serif çift isimleri, tam genişlikte fotoğraflar.
+Ivory zemin (`#f4efe5`), warm-white kartlar (`#fdfcfa`), charcoal metin, muted gold vurgu. Zemin kartlardan belirgin biçimde daha koyudur; aksi halde yığılan kartlar "bölüm" gibi okunur, kart gibi değil.
+
+Geniş whitespace, ince ayraç çizgileri, büyük serif çift isimleri, tam genişlikte fotoğraflar.
 
 Kaçınılacaklar (şartname §45): dashboard hissi, card yığını, aşırı yuvarlatma, gradient/neon, ağır gölge, popup.
 

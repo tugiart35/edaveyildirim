@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { Reveal, Section, SectionLabel } from "@/components/invitation/primitives";
+import { Reveal } from "@/components/invitation/primitives";
 import { countdownTo, type CountdownParts } from "@/lib/utils/date";
 
 const UNITS: Array<{ key: keyof CountdownParts; label: string }> = [
@@ -14,21 +14,18 @@ const UNITS: Array<{ key: keyof CountdownParts; label: string }> = [
 /**
  * Düğüne kalan süre.
  *
- * Sayılar yalnızca tarayıcıda hesaplanır. Sayfa statik olarak önceden
- * üretildiği için sunucudaki `Date.now()` build zamanına donar; ziyaretçinin
- * saati tek doğru kaynaktır.
+ * Sayılar yalnızca tarayıcıda hesaplanır: sayfa statik olarak önceden
+ * üretildiği için sunucudaki `Date.now()` build zamanına donar.
+ * Sayılar gelene kadar görünmez bir yer tutucu aynı yeri kaplar, böylece
+ * hidrasyon sırasında düzen kaymaz.
  *
- * Bölümün kabuğu (başlık, çerçeve, yükseklik) sunucuda da render edilir ve
- * sayılar görünmez bir yer tutucuyla aynı yeri kaplar — böylece hidrasyon
- * sırasında sayfa zıplamaz.
- *
- * Düğün tarihi geçmişse bölüm tamamen kaldırılır (şartname §10).
+ * Düğün geçtiğinde kartın tamamı `CardStack` tarafından kaldırılır.
  */
 export function Countdown({ targetMs }: { targetMs: number }) {
-  const [state, setState] = useState<{ parts: CountdownParts | null } | null>(null);
+  const [parts, setParts] = useState<CountdownParts | null>(null);
 
   useEffect(() => {
-    const tick = () => setState({ parts: countdownTo(targetMs, Date.now()) });
+    const tick = () => setParts(countdownTo(targetMs, Date.now()));
     tick();
 
     // Dakika hassasiyeti yeterli; saniyede bir render etmeye gerek yok.
@@ -36,33 +33,27 @@ export function Countdown({ targetMs }: { targetMs: number }) {
     return () => clearInterval(interval);
   }, [targetMs]);
 
-  // Düğün günü geldi: bölüm artık anlamlı değil.
-  if (state !== null && state.parts === null) return null;
-
-  const parts = state?.parts ?? null;
-
   return (
-    <Section className="border-t border-beige">
-      <Reveal className="flex flex-col items-center text-center">
-        <SectionLabel>Düğünümüze</SectionLabel>
+    <Reveal className="flex flex-col items-center text-center">
+      <p className="font-display text-2xl font-light text-graphite sm:text-3xl">
+        Düğünümüze
+      </p>
 
-        <div className="mt-12 flex items-start justify-center gap-8 sm:gap-14">
-          {UNITS.map((unit) => (
-            <div key={unit.key} className="flex flex-col items-center">
-              <span
-                className="font-display text-5xl font-light leading-none tabular-nums text-charcoal sm:text-6xl"
-                // Sayılar gelene kadar yer tutucu görünmez durur.
-                style={parts === null ? { visibility: "hidden" } : undefined}
-              >
-                {parts === null ? "00" : String(parts[unit.key]).padStart(2, "0")}
-              </span>
-              <span className="mt-3 text-[0.6rem] tracking-[0.3em] text-stone">
-                {unit.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </Reveal>
-    </Section>
+      <div className="mt-12 flex items-start justify-center gap-8 sm:gap-16">
+        {UNITS.map((unit) => (
+          <div key={unit.key} className="flex flex-col items-center">
+            <span
+              className="font-display text-6xl font-light leading-none tabular-nums text-charcoal sm:text-7xl"
+              style={parts === null ? { visibility: "hidden" } : undefined}
+            >
+              {parts === null ? "00" : String(parts[unit.key]).padStart(2, "0")}
+            </span>
+            <span className="mt-4 text-[0.6rem] tracking-[0.3em] text-stone">
+              {unit.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </Reveal>
   );
 }

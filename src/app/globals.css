@@ -8,11 +8,13 @@
    ========================================================================== */
 
 @theme {
-  /* Yüzeyler */
-  --color-ivory: #fbf9f5;
-  --color-warm-white: #ffffff;
-  --color-sand: #f2ede4;
-  --color-beige: #e8e0d3;
+  /* Yüzeyler
+     Zemin kartlardan belirgin biçimde daha koyu olmalı; aksi halde
+     yığılan kartlar "bölüm" gibi okunur, kart gibi değil. */
+  --color-ivory: #f4efe5;
+  --color-warm-white: #fdfcfa;
+  --color-sand: #ece5d8;
+  --color-beige: #ddd3c2;
 
   /* Metin */
   --color-charcoal: #2a2724;
@@ -84,6 +86,26 @@ body {
 [data-reveal][data-visible="true"] {
   opacity: 1;
   transform: none;
+}
+
+/* ==========================================================================
+   Kart yığını
+
+   Yapışkan kartların üst boşluğu başlık şeridi yüksekliğine göre artar;
+   böylece her kartın yalnızca başlığı üst üste birikir.
+   ========================================================================== */
+
+.card-stack {
+  --card-header: 3.25rem;
+  /* Yığılan başlıkların ekranın en tepesine yapışmaması için üst pay. */
+  --stack-gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .card-stack {
+    --card-header: 3.75rem;
+    --stack-gap: 1.25rem;
+  }
 }
 
 /* Hero'daki kaydırma ipucu: ince çizgi boyunca akan altın vurgu. */

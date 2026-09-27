@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { InvitationPage } from "@/components/invitation/invitation-page";
-import { Reveal, Section, SectionLabel } from "@/components/invitation/primitives";
+import { Reveal } from "@/components/invitation/primitives";
 import { getWedding } from "@/lib/data";
 import { coupleTitle } from "@/lib/utils/wedding";
 
@@ -27,16 +27,16 @@ export default async function HomePage() {
   return (
     <InvitationPage
       wedding={wedding}
-      rsvpSlot={
-        <Section className="border-t border-beige">
-          <Reveal className="flex flex-col items-center text-center">
-            <SectionLabel>Katılım</SectionLabel>
-            <p className="mt-10 max-w-sm text-balance text-sm leading-loose text-graphite">
-              Katılım durumunuzu bildirmek için size gönderilen kişisel davet
-              bağlantısını kullanabilirsiniz.
-            </p>
-          </Reveal>
-        </Section>
+      rsvpCard={
+        <Reveal className="flex flex-col items-center text-center">
+          <h3 className="font-display text-3xl font-light text-charcoal sm:text-4xl">
+            Aramızda olacak mısınız?
+          </h3>
+          <p className="mt-8 max-w-sm text-balance text-sm leading-loose text-graphite">
+            Katılım durumunuzu bildirmek için size gönderilen kişisel davet
+            bağlantısını kullanabilirsiniz.
+          </p>
+        </Reveal>
       }
     />
   );
