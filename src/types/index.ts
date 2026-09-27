@@ -1,0 +1,88 @@
+/**
+ * Uygulama genelinde kullanılan veri tipleri.
+ *
+ * Bu tipler veri kaynağından bağımsızdır: frontend fazında JSON dosyasından,
+ * backend fazında Supabase'ten aynı şekilde dönerler.
+ */
+
+export type NameOrder = "bride_first" | "groom_first";
+
+export type Theme = "minimal" | "romantic" | "modern" | "elegant" | "editorial";
+
+export const THEMES: readonly Theme[] = [
+  "minimal",
+  "romantic",
+  "modern",
+  "elegant",
+  "editorial",
+];
+
+/** RSVP kaydının veritabanındaki durumu. `pending` saklanmaz, türetilir. */
+export type RsvpStatus = "attending" | "declined";
+
+/** UI'da gösterilen üç değerli durum. */
+export type GuestStatus = RsvpStatus | "pending";
+
+export interface Wedding {
+  id: string;
+  brideName: string;
+  groomName: string;
+  nameOrder: NameOrder;
+  /** ISO tarih: "2026-10-18" */
+  eventDate: string;
+  /** 24 saat formatı: "19:30" */
+  eventTime: string;
+  /** IANA timezone: "Europe/Istanbul" */
+  timezone: string;
+  venueName: string;
+  venueAddress: string | null;
+  mapsUrl: string | null;
+  invitationText: string | null;
+  theme: Theme;
+  primaryImage: string | null;
+  galleryImages: string[];
+  musicUrl: string | null;
+  /** Yetişkin/çocuk ayrımı. Şema hazır, arayüz sonraki turda. */
+  enableChildSplit: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Guest {
+  id: string;
+  weddingId: string;
+  name: string;
+  phone: string | null;
+  groupName: string | null;
+  invitationLimit: number;
+  token: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Rsvp {
+  id: string;
+  guestId: string;
+  status: RsvpStatus;
+  attendingCount: number;
+  adultCount: number | null;
+  childCount: number | null;
+  note: string | null;
+  respondedAt: string;
+  updatedAt: string;
+}
+
+/** Davetli + varsa RSVP kaydı. RSVP yoksa davetli "cevap bekleniyor" durumundadır. */
+export interface GuestWithRsvp extends Guest {
+  rsvp: Rsvp | null;
+}
+
+/** Bir davetlinin üç değerli görünen durumunu döndürür. */
+export function guestStatus(guest: GuestWithRsvp): GuestStatus {
+  return guest.rsvp?.status ?? "pending";
+}
+
+/** Bu davetliden beklenen kişi sayısı. Gelmeyen veya cevap vermeyen için 0. */
+export function expectedPeopleFor(guest: GuestWithRsvp): number {
+  return guest.rsvp?.status === "attending" ? guest.rsvp.attendingCount : 0;
+}
