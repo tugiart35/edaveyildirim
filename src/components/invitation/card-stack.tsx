@@ -14,6 +14,11 @@ export interface StackCard {
   action?: { href: string; label: string };
   /** Düğün tarihi geçtiğinde bu kart tamamen kaldırılır. */
   hideWhenPast?: boolean;
+  /**
+   * İçeriği okuma sütununa sıkıştırmaz, kartın tüm genişliğini verir.
+   * Galeri gibi görsel içerikler içindir; metin bloklarında kullanılmaz.
+   */
+  wide?: boolean;
 }
 
 /**
@@ -98,7 +103,15 @@ export function CardStack({
           </header>
 
           <div className="flex min-h-[62svh] items-center justify-center px-6 py-14 sm:px-10 sm:py-20">
-            <div className="card-content w-full max-w-xl">{card.content}</div>
+            <div
+              className={
+                card.wide
+                  ? "card-content w-full"
+                  : "card-content w-full max-w-xl"
+              }
+            >
+              {card.content}
+            </div>
           </div>
         </section>
       ))}

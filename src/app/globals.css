@@ -260,6 +260,19 @@ body {
   }
 }
 
+/**
+ * Yatay şeritlerde tarayıcının kaba kaydırma çubuğunu gizler.
+ * Kenardan yarım görünen sonraki öğe kaydırma işaretidir; klavye
+ * kullanıcıları için şerit ayrıca odaklanabilir yapılır.
+ */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Hero'daki kaydırma ipucu: ince çizgi boyunca akan altın vurgu. */
 @keyframes scroll-hint {
   0% {

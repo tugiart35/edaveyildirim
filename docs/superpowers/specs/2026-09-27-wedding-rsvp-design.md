@@ -252,12 +252,16 @@ Bir sonraki kart üzerine kayarken öncekinin yalnızca başlık şeridi görün
 
 Başlık şeridi solda hairline + aralıklı büyük harf etiket, sağda opsiyonel pill bağlantı taşır. Bölümler numaralandırılmaz — numaralar portfolyoda proje sıralamak için anlamlıdır, davetiyede liste hissi verir.
 
+Kart içeriği varsayılan olarak okuma sütununa (`max-w-xl`) sığdırılır. Görsel içerikler `wide` bayrağıyla kartın tüm genişliğini alır.
+
+**Kart yüksekliği bir ekranı aşmamalıdır.** Aşarsa yığılma okunmaz hale gelir: tek bir kartın içinde uzun süre kaydırılır, önceki başlıklar anlamsızca tepede birikir. Galeri bu yüzden dikey ızgara değil yatay şerittir — dört fotoğrafın dikey ızgarası kartı iki ekran boyuna çıkarıyordu.
+
 **Kartlar**
 
 | Kart | Etiket | Başlık eylemi | Görünürlük |
 |---|---|---|---|
 | Geri sayım | GERİ SAYIM | — | Düğün geçtiyse kaldırılır |
-| Galeri | BİZ | — | `gallery_images` boşsa oluşturulmaz |
+| Galeri | BİZ | — | `gallery_images` boşsa oluşturulmaz; geniş içerik |
 | Detaylar | DÜĞÜN | Yol Tarifi ↗ | `maps_url` yoksa eylem gizlenir |
 | RSVP | KATILIM | — | Her zaman; içerik sayfaya göre değişir |
 

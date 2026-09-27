@@ -42,6 +42,7 @@ export function InvitationPage({
     cards.push({
       id: "biz",
       label: "Biz",
+      wide: true,
       content: <PhotoGallery wedding={wedding} />,
     });
   }
