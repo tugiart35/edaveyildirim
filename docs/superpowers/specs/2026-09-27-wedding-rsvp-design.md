@@ -39,7 +39,7 @@ Public davetiye sayfası, kişiye özel token'lı davetiye, RSVP alma ve güncel
 | Framework | Next.js 15, App Router | Şartname §6 |
 | Dil | TypeScript (strict) | — |
 | Stil | Tailwind CSS v4 | — |
-| Admin UI | shadcn/ui (button, input, table, dialog, select, badge, sonner) | Şartname §6; yalnızca admin tarafında |
+| Admin UI | Elle yazılmış bileşenler + yerel `<dialog>` | Aşağıdaki nota bakın |
 | Public UI | Tamamen özel bileşenler | Şartname §45: generic SaaS görünümü olmamalı |
 | Veritabanı | Supabase Postgres | Şartname §6 |
 | Dosya | Supabase Storage, bucket `wedding-assets` | Şartname §37 |
@@ -52,6 +52,10 @@ Public davetiye sayfası, kişiye özel token'lı davetiye, RSVP alma ve güncel
 | Deploy | Vercel + Supabase | Şartname §63 |
 
 **State yönetimi:** React yerel state + Server Actions. Redux / React Query yok.
+
+**shadcn/ui kullanılmadı.** Şartname §6 "mümkünse" diyor; kendi jeton sistemimiz (`--color-*`, `--card-radius`, `--button-radius`) zaten kurulu ve shadcn kendi renk değişkenleriyle gelerek onunla çakışırdı. İhtiyaç duyulan tek karmaşık parça modal; bunun için yerel `<dialog>` öğesi kullanıldı — odak tuzağı, Esc ile kapatma ve arka planın devre dışı kalması tarayıcıdan geliyor.
+
+> Tailwind'in reset'i tüm öğelerde `margin: 0` uyguladığı için `<dialog>`'un varsayılan `margin: auto` ortalaması kaybolur; modallerde `m-auto` açıkça verilir.
 
 ---
 
@@ -382,9 +386,19 @@ Geçersiz token → "Davet bağlantısı bulunamadı. Lütfen size gönderilen b
 
 ### 10.1 Auth
 
-`ADMIN_EMAIL` ve `ADMIN_PASSWORD_HASH` (bcrypt) env'de tutulur. Doğrulama başarılıysa `jose` ile HS256 imzalı JWT (`AUTH_SECRET`), 7 gün ömürlü, `httpOnly` + `secure` + `sameSite=lax` cookie'ye yazılır. Middleware imzayı ve süreyi doğrular. Çıkış cookie'yi siler.
+`ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` ve `AUTH_SECRET` env'de tutulur; hiçbiri koda gömülmez ve hiçbiri tarayıcıya gönderilmez.
 
-Hash üretmek için yardımcı script: `npm run hash-password`.
+**Şifre:** Node'un yerleşik `scrypt`'i. Ek bağımlılık yok, bcrypt kadar güvenli. Doğrulama sabit zamanlı.
+
+**Oturum:** `node:crypto` HMAC-SHA256 ile imzalı jeton, 7 gün ömürlü, `httpOnly` + `secure` (production) + `sameSite=lax` cookie. Payload yalnızca bitiş zamanını taşır — tek admin olduğu için kimlik bilgisi gereksiz.
+
+**Hash biçimi:** `scrypt.<tuz>.<anahtar>`, base64url.
+
+> Ayraç bcrypt geleneğindeki `$` **değildir**. Next.js `.env` dosyalarında değişken genişletmesi yapar ve `$...` dizilerini değişken referansı sanıp siler — hash uygulamaya ulaşmadan bozulur. base64url nokta içermediği için `.` güvenli ayraçtır. `AUTH_SECRET` de aynı nedenle hex üretilir.
+
+**Koruma:** `src/proxy.ts` (Next.js 16'da `middleware` bu isme taşındı, yalnızca Node.js çalışma zamanında koşar). `/admin/*` altındaki her rota oturum ister; giriş ekranının kendisi (`/admin`) hariç. Girişten sonra dönülecek yol `?devam=` ile taşınır ve yalnızca `/admin/` ile başlayan değerler kabul edilir (açık yönlendirme koruması).
+
+Hash ve secret üretmek için: `npm run hash-password -- "şifreniz"`.
 
 ### 10.2 Dashboard
 

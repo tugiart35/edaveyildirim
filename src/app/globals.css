@@ -136,6 +136,31 @@
 }
 
 /**
+ * Admin paneli davetiye temasından etkilenmez.
+ *
+ * Panelin işi doğru sayıyı göstermek; dekoratif olmak zorunda değil
+ * (şartname §47). Nötr gri palet ve sans-serif başlıklar kullanır.
+ */
+[data-theme="admin"] {
+  --color-ivory: #f7f7f6;
+  --color-warm-white: #ffffff;
+  --color-sand: #f0f0ee;
+  --color-beige: #e2e2de;
+  --color-charcoal: #1d1d1b;
+  --color-graphite: #56564f;
+  --color-stone: #85857d;
+  --color-gold: #6b6b62;
+  --color-gold-soft: #b5b5ac;
+
+  --display-family: var(--font-inter), system-ui, sans-serif;
+  --display-weight: 500;
+  --display-tracking: -0.02em;
+  --label-tracking: 0.12em;
+  --card-radius: 0.75rem;
+  --button-radius: 0.5rem;
+}
+
+/**
  * Başlık tipografisi.
  *
  * `font-display` yardımcısı yerine bu sınıf kullanılır; font ailesi,

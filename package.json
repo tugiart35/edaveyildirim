@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "reset-data": "rm -rf .data && echo 'Veri deposu sifirlandi; sonraki istekte ornek veri yeniden olusturulacak.'"
+    "reset-data": "rm -rf .data && echo 'Veri deposu sifirlandi; sonraki istekte ornek veri yeniden olusturulacak.'",
+    "hash-password": "node scripts/hash-password.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

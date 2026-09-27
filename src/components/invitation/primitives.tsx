@@ -32,6 +32,9 @@ export function Reveal({
 /** İnce yatay ayraç çizgisi. */
 export function Hairline({ className }: { className?: string }) {
   return (
-    <span aria-hidden className={cn("block h-px w-12 bg-gold-soft", className)} />
+    <span
+      aria-hidden
+      className={cn("block h-px w-12 bg-gold-soft", className)}
+    />
   );
 }
