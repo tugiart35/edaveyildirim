@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 
+import { getWedding } from "@/lib/data";
+
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -21,10 +23,20 @@ export const metadata: Metadata = {
   description: "Online düğün davetiyesi ve katılım bildirimi.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+/**
+ * Tema kök öğeye yazılır: sayfa arka planı `body` üzerinde olduğu için
+ * tema değişkenlerinin `body`'yi de kapsaması gerekir.
+ *
+ * Admin paneli davetiye temasından etkilenmemelidir; kendi layout'unda
+ * `data-theme` değerini sıfırlar.
+ */
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const wedding = await getWedding();
+
   return (
     <html
       lang="tr"
+      data-theme={wedding.theme}
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>

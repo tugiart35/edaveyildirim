@@ -36,21 +36,24 @@ export function InvitationHero({
             className="object-cover"
           />
           {/* Metnin okunabilirliği için yumuşak perde. */}
-          <div aria-hidden className="absolute inset-0 bg-ivory/75" />
+          <div aria-hidden className="absolute inset-0 bg-ivory/78" />
         </>
       ) : null}
 
       {/* Basılı davetiye hissi veren ince çerçeve. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-4 border border-beige sm:inset-8"
+        className="pointer-events-none absolute inset-4 rounded-(--card-radius) border border-beige sm:inset-8"
       />
 
       <div className="relative flex w-full max-w-lg flex-col items-center text-center">
         {guestName ? (
           <p className="mb-10 text-sm leading-relaxed text-graphite">
             Sevgili{" "}
-            <span className="font-display text-xl text-charcoal">{guestName}</span>,
+            <span className="type-display text-xl text-charcoal">
+              {guestName}
+            </span>
+            ,
           </p>
         ) : null}
 
@@ -60,17 +63,19 @@ export function InvitationHero({
 
         <Hairline className="mt-6 w-10" />
 
-        <h1 className="mt-10 font-display font-light leading-[0.95] text-charcoal">
-          <span className="block text-6xl sm:text-7xl lg:text-8xl">{first}</span>
-          <span className="my-4 block text-2xl font-light text-gold sm:text-3xl">
-            &
+        <h1 className="type-display mt-10 leading-[0.95] text-charcoal">
+          <span className="block text-6xl sm:text-7xl lg:text-8xl">
+            {first}
           </span>
-          <span className="block text-6xl sm:text-7xl lg:text-8xl">{second}</span>
+          <span className="my-4 block text-2xl text-gold sm:text-3xl">&</span>
+          <span className="block text-6xl sm:text-7xl lg:text-8xl">
+            {second}
+          </span>
         </h1>
 
         <Hairline className="mt-10 w-10" />
 
-        <p className="mt-8 text-xs tracking-[0.35em] text-graphite sm:text-sm">
+        <p className="mt-8 text-xs tracking-(--label-tracking) text-graphite sm:text-sm">
           {trUpper(formatLongDate(wedding.eventDate))}
         </p>
 

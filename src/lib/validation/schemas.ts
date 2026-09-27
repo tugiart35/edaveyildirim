@@ -22,7 +22,9 @@ export const weddingInputSchema = z.object({
   timezone: z.string().trim().min(1),
   venueName: z.string().trim().min(1, "Mekân adı gerekli.").max(120),
   venueAddress: z.string().trim().max(300).nullable(),
-  mapsUrl: z.union([z.url("Geçerli bir bağlantı girin."), z.literal("")]).nullable(),
+  mapsUrl: z
+    .union([z.url("Geçerli bir bağlantı girin."), z.literal("")])
+    .nullable(),
   invitationText: z.string().trim().max(600).nullable(),
   theme: z.enum(THEMES as unknown as [string, ...string[]]),
   primaryImage: z.string().nullable(),
@@ -76,7 +78,10 @@ export const rsvpInputSchema = z
     note: z
       .string()
       .trim()
-      .max(MAX_NOTE_LENGTH, `Not en fazla ${MAX_NOTE_LENGTH} karakter olabilir.`)
+      .max(
+        MAX_NOTE_LENGTH,
+        `Not en fazla ${MAX_NOTE_LENGTH} karakter olabilir.`,
+      )
       .nullable()
       .transform((value) => (value === "" ? null : value)),
   })

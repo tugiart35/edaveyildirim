@@ -27,7 +27,9 @@ function timezoneOffsetMs(utcMs: number, timeZone: string): number {
   });
 
   const parts = Object.fromEntries(
-    formatter.formatToParts(new Date(utcMs)).map((part) => [part.type, part.value]),
+    formatter
+      .formatToParts(new Date(utcMs))
+      .map((part) => [part.type, part.value]),
   );
 
   const asUtc = Date.UTC(
@@ -77,7 +79,10 @@ export interface CountdownParts {
  * Hedef zamana kalan süreyi parçalara ayırır.
  * Hedef geçmişteyse `null` döner — countdown gösterilmemelidir.
  */
-export function countdownTo(targetMs: number, nowMs: number): CountdownParts | null {
+export function countdownTo(
+  targetMs: number,
+  nowMs: number,
+): CountdownParts | null {
   const remaining = targetMs - nowMs;
   if (remaining <= 0) return null;
 

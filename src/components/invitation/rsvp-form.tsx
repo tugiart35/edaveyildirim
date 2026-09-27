@@ -81,14 +81,14 @@ export function RsvpForm({ guest }: { guest: GuestWithRsvp }) {
         <button
           type="button"
           onClick={() => setView({ kind: "form", status: "attending" })}
-          className="w-full rounded-[2px] bg-charcoal px-8 py-4 text-[0.7rem] tracking-[0.2em] text-ivory transition-opacity duration-300 hover:opacity-85 sm:w-auto"
+          className="w-full rounded-(--button-radius) bg-charcoal px-8 py-4 text-[0.7rem] tracking-[0.2em] text-ivory transition-opacity duration-300 hover:opacity-85 sm:w-auto"
         >
           EVET, KATILACAĞIM
         </button>
         <button
           type="button"
           onClick={() => setView({ kind: "form", status: "declined" })}
-          className="w-full rounded-[2px] border border-charcoal/25 px-8 py-4 text-[0.7rem] tracking-[0.2em] text-graphite transition-colors duration-300 hover:border-charcoal/50 hover:text-charcoal sm:w-auto"
+          className="w-full rounded-(--button-radius) border border-charcoal/25 px-8 py-4 text-[0.7rem] tracking-[0.2em] text-graphite transition-colors duration-300 hover:border-charcoal/50 hover:text-charcoal sm:w-auto"
         >
           NE YAZIK Kİ KATILAMAYACAĞIM
         </button>
@@ -109,7 +109,8 @@ export function RsvpForm({ guest }: { guest: GuestWithRsvp }) {
         />
       ) : (
         <p className="text-balance text-sm leading-loose text-graphite">
-          Bildirdiğiniz için teşekkür ederiz. Dilerseniz bir not bırakabilirsiniz.
+          Bildirdiğiniz için teşekkür ederiz. Dilerseniz bir not
+          bırakabilirsiniz.
         </p>
       )}
 
@@ -126,7 +127,7 @@ export function RsvpForm({ guest }: { guest: GuestWithRsvp }) {
           type="button"
           disabled={isPending}
           onClick={() => send(view.status)}
-          className="w-full rounded-[2px] bg-charcoal px-8 py-4 text-[0.7rem] tracking-[0.2em] text-ivory transition-opacity duration-300 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56"
+          className="w-full rounded-(--button-radius) bg-charcoal px-8 py-4 text-[0.7rem] tracking-[0.2em] text-ivory transition-opacity duration-300 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56"
         >
           {isPending ? "GÖNDERİLİYOR…" : "GÖNDER"}
         </button>
@@ -164,7 +165,7 @@ function PeopleStepper({
   if (max === 1) {
     return (
       <p className="text-sm leading-loose text-graphite">
-        Sizi <span className="font-display text-xl text-charcoal">1 kişi</span>{" "}
+        Sizi <span className="type-display text-xl text-charcoal">1 kişi</span>{" "}
         olarak bekliyoruz.
       </p>
     );
@@ -188,7 +189,7 @@ function PeopleStepper({
         <output
           aria-live="polite"
           aria-labelledby="people-label"
-          className="min-w-28 text-center font-display text-3xl font-light text-charcoal tabular-nums"
+          className="min-w-28 text-center type-display text-3xl text-charcoal tabular-nums"
         >
           {value} kişi
         </output>
@@ -286,7 +287,7 @@ function RsvpSaved({
       {justSubmitted ? (
         attending ? (
           <>
-            <p className="font-display text-3xl font-light text-charcoal">
+            <p className="type-display text-3xl text-charcoal">
               Teşekkür ederiz 🤍
             </p>
             <p className="mt-6 max-w-sm text-balance text-sm leading-loose text-graphite">
@@ -298,7 +299,7 @@ function RsvpSaved({
           </>
         ) : (
           <>
-            <p className="font-display text-3xl font-light text-charcoal">
+            <p className="type-display text-3xl text-charcoal">
               Bilgi verdiğiniz için teşekkür ederiz.
             </p>
             <p className="mt-6 max-w-sm text-balance text-sm leading-loose text-graphite">
@@ -312,7 +313,7 @@ function RsvpSaved({
           <p className="text-sm text-graphite">Katılım durumunuz</p>
           <p
             className={cn(
-              "mt-4 font-display text-3xl font-light",
+              "mt-4 type-display text-3xl ",
               attending ? "text-status-attending" : "text-graphite",
             )}
           >
@@ -329,7 +330,7 @@ function RsvpSaved({
       <button
         type="button"
         onClick={onEdit}
-        className="mt-10 rounded-[2px] border border-charcoal/25 px-8 py-3.5 text-[0.7rem] tracking-[0.2em] text-charcoal transition-colors duration-300 hover:border-gold hover:text-gold"
+        className="mt-10 rounded-(--button-radius) border border-charcoal/25 px-8 py-3.5 text-[0.7rem] tracking-[0.2em] text-charcoal transition-colors duration-300 hover:border-gold hover:text-gold"
       >
         CEVABIMI DEĞİŞTİR
       </button>

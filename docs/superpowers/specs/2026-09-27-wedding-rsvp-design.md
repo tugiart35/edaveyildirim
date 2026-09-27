@@ -261,11 +261,35 @@ Başlık şeridi solda hairline + aralıklı büyük harf etiket, sağda opsiyon
 | Detaylar | DÜĞÜN | Yol Tarifi ↗ | `maps_url` yoksa eylem gizlenir |
 | RSVP | KATILIM | — | Her zaman; içerik sayfaya göre değişir |
 
+**Geçiş hareketi**
+
+Kart yerine otururken içeriği süzülerek gelir. `CardStack` her kaydırma karesinde her karta `--enter` yazar: `0` = henüz aşağıda, `1` = yapıştığı yerde.
+
+```
+--enter = clamp01(1 − (kartın üstü − yapışma noktası) / 280px)
+```
+
+`--enter` üç şeyi sürer:
+
+| Hedef | Etki |
+|---|---|
+| `.card-content` opaklığı | 0.1 → 1 |
+| `.card-content` kaydırması | 1.75rem aşağıdan 0'a |
+| Kartın gölgesi | sığdan derine |
+
+Ayrıca o anda ekranda en çok yer kaplayan kart `data-active` alır; başlığı `stone`'dan `charcoal`'a döner ve yanındaki hairline uzar. Böylece yığında hangi kartın okunduğu belli olur.
+
+Bir kartın "ekranda kapladığı yer", kendi üstünden **bir sonraki kartın üstüne** kadar olan mesafedir — gerisi zaten sonraki kartın altında kalır. Bu olmadan yapışmış ilk kart hep en geniş görünür ve `data-active` hiç ilerlemez.
+
+Hesabın tamamı `src/lib/stack/stack-frame.ts` içindeki saf `computeStackFrame()` fonksiyonundadır; DOM okumaları çağıran tarafta yapılır, matematik tarayıcısız test edilir.
+
 **Teknik notlar**
 
-- Yığılma saf CSS'tir. `CardStack` bileşeninin istemci tarafında olmasının tek nedeni, düğün geçtiğinde geri sayım kartını listeden düşürmektir — sayfa statik üretildiği için bu karar sunucuda verilemez.
-- Yapışkan öğeye `transform` uygulanmaz; `Reveal` sarmalayıcısı yalnızca kart *içeriğinde* kullanılır. Aksi halde transform yeni bir containing block oluşturur ve sticky bozulur.
+- Yığılma saf CSS'tir. `CardStack`'in istemci tarafında olmasının nedenleri: geçiş ilerlemesini yazmak ve düğün geçtiğinde geri sayım kartını listeden düşürmek (sayfa statik üretildiği için bu karar sunucuda verilemez).
+- Yapışkan öğeye `transform` uygulanmaz; hareket kart *içeriğine* verilir. Aksi halde transform yeni bir containing block oluşturur ve sticky riske girer.
 - Yapışkan öğelerin hiçbir atası `overflow: hidden` olmamalıdır.
+- `prefers-reduced-motion` açıkken dinleyici hiç kurulmaz ve içerik tam opaklıkta kalır.
+- Kaydırma dinleyicisi pasiftir ve `requestAnimationFrame` ile bir kareye indirgenir.
 
 ### Diğer bölümler
 
@@ -275,9 +299,27 @@ Başlık şeridi solda hairline + aralıklı büyük harf etiket, sağda opsiyon
 
 ### Tasarım dili
 
-Ivory zemin (`#f4efe5`), warm-white kartlar (`#fdfcfa`), charcoal metin, muted gold vurgu. Zemin kartlardan belirgin biçimde daha koyudur; aksi halde yığılan kartlar "bölüm" gibi okunur, kart gibi değil.
+Geniş whitespace, ince ayraç çizgileri, büyük çift isimleri, tam genişlikte fotoğraflar.
 
-Geniş whitespace, ince ayraç çizgileri, büyük serif çift isimleri, tam genişlikte fotoğraflar.
+Zemin, kartlardan belirgin biçimde daha koyudur; aksi halde yığılan kartlar "bölüm" gibi okunur, kart gibi değil.
+
+### Temalar
+
+Şartname §5'teki beş tema yalnızca renk değiştirmez — başlık fontu, harf ağırlığı, harf aralığı, köşe yarıçapı ve buton biçimi de değişir. Hepsi CSS değişkeni olarak `[data-theme="…"]` altında tanımlıdır; `data-theme` kök öğeye yazılır ve Tailwind yardımcıları `var(--color-*)` referansı derlediği için tüm arayüz yeniden renklenir.
+
+| Tema | Zemin | Vurgu | Başlık | Köşe | Buton |
+|---|---|---|---|---|---|
+| **elegant** *(varsayılan)* | ivory `#f4efe5` | muted gold | Cormorant 300 | 1.75rem | 2px |
+| **minimal** | soğuk beyaz `#f2f2f1` | gri | Inter 300, sıkı | 0.375rem | 2px |
+| **romantic** | blush `#f8eeea` | gül kurusu | Cormorant 300 | 2.5rem | pill |
+| **modern** | soğuk gri `#e9e9e6` | mürekkep (tek renk) | Inter 500, çok sıkı | 0.125rem | köşeli |
+| **editorial** | sıcak kağıt `#f0e9dc` | terracotta | Cormorant 400 | 0 | köşeli |
+
+İki font ailesi kuralı korunur (şartname §46): her tema Cormorant veya Inter'i başlık olarak kullanır, gövde her zaman Inter'dir.
+
+Başlık tipografisi `font-display` yardımcısı yerine `.type-display` sınıfıyla yazılır; aile, ağırlık ve harf aralığının üçü birden temaya bağlıdır.
+
+Admin paneli davetiye temasından etkilenmemelidir; kendi layout'unda `data-theme` değerini sıfırlar.
 
 Kaçınılacaklar (şartname §45): dashboard hissi, card yığını, aşırı yuvarlatma, gradient/neon, ağır gölge, popup.
 

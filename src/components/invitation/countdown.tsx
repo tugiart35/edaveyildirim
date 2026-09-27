@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import { Reveal } from "@/components/invitation/primitives";
 import { countdownTo, type CountdownParts } from "@/lib/utils/date";
 
 const UNITS: Array<{ key: keyof CountdownParts; label: string }> = [
@@ -34,8 +33,8 @@ export function Countdown({ targetMs }: { targetMs: number }) {
   }, [targetMs]);
 
   return (
-    <Reveal className="flex flex-col items-center text-center">
-      <p className="font-display text-2xl font-light text-graphite sm:text-3xl">
+    <div className="flex flex-col items-center text-center">
+      <p className="type-display text-2xl text-graphite sm:text-3xl">
         Düğünümüze
       </p>
 
@@ -43,7 +42,7 @@ export function Countdown({ targetMs }: { targetMs: number }) {
         {UNITS.map((unit) => (
           <div key={unit.key} className="flex flex-col items-center">
             <span
-              className="font-display text-6xl font-light leading-none tabular-nums text-charcoal sm:text-7xl"
+              className="type-display text-6xl leading-none tabular-nums text-charcoal sm:text-7xl"
               style={parts === null ? { visibility: "hidden" } : undefined}
             >
               {parts === null ? "00" : String(parts[unit.key]).padStart(2, "0")}
@@ -54,6 +53,6 @@ export function Countdown({ targetMs }: { targetMs: number }) {
           </div>
         ))}
       </div>
-    </Reveal>
+    </div>
   );
 }

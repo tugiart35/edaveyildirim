@@ -4,7 +4,11 @@ import { randomUUID } from "node:crypto";
 
 import { loadStore, withStore } from "@/lib/data/json-store";
 import { generateToken } from "@/lib/utils/token";
-import type { GuestInput, RsvpInput, WeddingInput } from "@/lib/validation/schemas";
+import type {
+  GuestInput,
+  RsvpInput,
+  WeddingInput,
+} from "@/lib/validation/schemas";
 import type { Guest, GuestWithRsvp, Rsvp, Wedding } from "@/types";
 
 /**
@@ -50,7 +54,9 @@ export async function listGuests(): Promise<GuestWithRsvp[]> {
     .sort((a, b) => a.name.localeCompare(b.name, "tr"));
 }
 
-export async function getGuestByToken(token: string): Promise<GuestWithRsvp | null> {
+export async function getGuestByToken(
+  token: string,
+): Promise<GuestWithRsvp | null> {
   const store = await loadStore();
   const guest = store.guests.find((candidate) => candidate.token === token);
   if (!guest) return null;
@@ -94,7 +100,10 @@ export async function createGuest(input: GuestInput): Promise<Guest> {
   });
 }
 
-export async function updateGuest(id: string, input: GuestInput): Promise<Guest> {
+export async function updateGuest(
+  id: string,
+  input: GuestInput,
+): Promise<Guest> {
   return withStore((store) => {
     const guest = store.guests.find((candidate) => candidate.id === id);
     if (!guest) throw new Error(`Davetli bulunamadı: ${id}`);
@@ -127,7 +136,10 @@ export async function deleteGuest(id: string): Promise<void> {
  * Her davetli için en fazla bir RSVP kaydı tutulur. İlk cevabın zamanı
  * (`respondedAt`) sonraki güncellemelerde korunur.
  */
-export async function saveRsvp(guestId: string, input: RsvpInput): Promise<Rsvp> {
+export async function saveRsvp(
+  guestId: string,
+  input: RsvpInput,
+): Promise<Rsvp> {
   return withStore((store) => {
     const now = new Date().toISOString();
     const existing = store.rsvps.find((rsvp) => rsvp.guestId === guestId);

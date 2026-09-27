@@ -44,7 +44,9 @@ export function ScrollReveal() {
 
     const observeAll = () => {
       document
-        .querySelectorAll<HTMLElement>('[data-reveal]:not([data-visible="true"])')
+        .querySelectorAll<HTMLElement>(
+          '[data-reveal]:not([data-visible="true"])',
+        )
         .forEach((element) => intersections.observe(element));
     };
 

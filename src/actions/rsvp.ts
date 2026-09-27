@@ -7,8 +7,7 @@ import { rsvpInputSchemaFor } from "@/lib/validation/schemas";
 import type { Rsvp } from "@/types";
 
 export type SubmitRsvpResult =
-  | { ok: true; rsvp: Rsvp }
-  | { ok: false; error: string };
+  { ok: true; rsvp: Rsvp } | { ok: false; error: string };
 
 /**
  * Davetlinin katılım cevabını kaydeder.

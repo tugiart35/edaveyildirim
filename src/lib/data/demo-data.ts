@@ -23,8 +23,15 @@ export const demoWedding: Wedding = {
   invitationText:
     "Bu özel günümüzde sizleri de aramızda görmekten mutluluk duyarız.",
   theme: "elegant",
-  primaryImage: null,
-  galleryImages: [],
+  // Geçici mockup görselleri (Unsplash). Gerçek fotoğraflar admin
+  // panelinden yüklendiğinde `public/mock/` klasörü silinebilir.
+  primaryImage: "/mock/hero.jpg",
+  galleryImages: [
+    "/mock/galeri-1.jpg",
+    "/mock/galeri-2.jpg",
+    "/mock/galeri-3.jpg",
+    "/mock/galeri-4.jpg",
+  ],
   musicUrl: null,
   enableChildSplit: false,
   createdAt: "2026-01-01T00:00:00.000Z",
@@ -38,7 +45,11 @@ interface DemoGuestSeed {
   groupName: string | null;
   invitationLimit: number;
   token: string;
-  rsvp: { status: Rsvp["status"]; attendingCount: number; note: string | null } | null;
+  rsvp: {
+    status: Rsvp["status"];
+    attendingCount: number;
+    note: string | null;
+  } | null;
 }
 
 const seeds: DemoGuestSeed[] = [

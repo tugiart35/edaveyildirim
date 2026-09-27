@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-import { Reveal } from "@/components/invitation/primitives";
 import { coupleTitle } from "@/lib/utils/wedding";
 import type { Wedding } from "@/types";
 
@@ -16,31 +15,30 @@ export function PhotoGallery({ wedding }: { wedding: Wedding }) {
   const couple = coupleTitle(wedding);
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-      <Reveal className="sm:col-span-2">
-        <figure className="relative aspect-[4/3] overflow-hidden bg-sand">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+      <figure className="relative aspect-[4/3] overflow-hidden rounded-(--card-radius) bg-sand sm:col-span-2">
+        <Image
+          src={lead}
+          alt={`${couple} — fotoğraf 1`}
+          fill
+          sizes="(min-width: 640px) 36rem, 100vw"
+          className="object-cover"
+        />
+      </figure>
+
+      {rest.map((src, index) => (
+        <figure
+          key={src}
+          className="relative aspect-[3/4] overflow-hidden rounded-(--card-radius) bg-sand"
+        >
           <Image
-            src={lead}
-            alt={`${couple} — fotoğraf 1`}
+            src={src}
+            alt={`${couple} — fotoğraf ${index + 2}`}
             fill
-            sizes="(min-width: 640px) 36rem, 100vw"
+            sizes="(min-width: 640px) 18rem, 100vw"
             className="object-cover"
           />
         </figure>
-      </Reveal>
-
-      {rest.map((src, index) => (
-        <Reveal key={src} delay={(index % 2) * 120}>
-          <figure className="relative aspect-[3/4] overflow-hidden bg-sand">
-            <Image
-              src={src}
-              alt={`${couple} — fotoğraf ${index + 2}`}
-              fill
-              sizes="(min-width: 640px) 18rem, 100vw"
-              className="object-cover"
-            />
-          </figure>
-        </Reveal>
       ))}
     </div>
   );

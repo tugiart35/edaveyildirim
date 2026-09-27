@@ -32,15 +32,17 @@ function guest(invitationLimit: number): GuestWithRsvp {
 beforeEach(() => {
   getGuestByToken.mockReset();
   saveRsvp.mockReset();
-  saveRsvp.mockImplementation((guestId: string, input: Record<string, unknown>) => ({
-    id: "rsvp-1",
-    guestId,
-    ...input,
-    adultCount: null,
-    childCount: null,
-    respondedAt: "2026-02-01T00:00:00.000Z",
-    updatedAt: "2026-02-01T00:00:00.000Z",
-  }));
+  saveRsvp.mockImplementation(
+    (guestId: string, input: Record<string, unknown>) => ({
+      id: "rsvp-1",
+      guestId,
+      ...input,
+      adultCount: null,
+      childCount: null,
+      respondedAt: "2026-02-01T00:00:00.000Z",
+      updatedAt: "2026-02-01T00:00:00.000Z",
+    }),
+  );
 });
 
 describe("submitRsvp", () => {
@@ -53,7 +55,10 @@ describe("submitRsvp", () => {
       note: null,
     });
 
-    expect(result).toEqual({ ok: false, error: "Davet bağlantısı bulunamadı." });
+    expect(result).toEqual({
+      ok: false,
+      error: "Davet bağlantısı bulunamadı.",
+    });
     expect(saveRsvp).not.toHaveBeenCalled();
   });
 

@@ -1,12 +1,11 @@
-import { Reveal } from "@/components/invitation/primitives";
 import { RsvpForm } from "@/components/invitation/rsvp-form";
 import type { GuestWithRsvp } from "@/types";
 
 /** Davetiyenin RSVP kartının içeriği (şartname §13). */
 export function RsvpSection({ guest }: { guest: GuestWithRsvp }) {
   return (
-    <Reveal className="flex flex-col items-center text-center">
-      <h3 className="font-display text-3xl font-light text-charcoal sm:text-4xl">
+    <div className="flex flex-col items-center text-center">
+      <h3 className="type-display text-3xl text-charcoal sm:text-4xl">
         Aramızda olacak mısınız?
       </h3>
 
@@ -16,6 +15,6 @@ export function RsvpSection({ guest }: { guest: GuestWithRsvp }) {
       </p>
 
       <RsvpForm guest={guest} />
-    </Reveal>
+    </div>
   );
 }

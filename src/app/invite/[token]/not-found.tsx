@@ -11,7 +11,10 @@ import { Hairline } from "@/components/invitation/primitives";
 export default function InviteNotFound() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 py-24 text-center">
-      <div aria-hidden className="pointer-events-none fixed inset-4 border border-beige sm:inset-8" />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-4 border border-beige sm:inset-8"
+      />
 
       <div className="relative flex max-w-sm flex-col items-center">
         <Hairline className="w-10" />

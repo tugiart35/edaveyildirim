@@ -36,10 +36,115 @@
   /* Tipografi */
   --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
 
-  /* Davetiye bölümleri için geniş whitespace ölçeği */
-  --spacing-section: 6rem;
-  --spacing-section-lg: 9rem;
+/* ==========================================================================
+   Temalar
+
+   Tema yalnızca renk değiştirmez: başlık fontu, harf ağırlığı, köşe
+   yarıçapı ve buton biçimi de değişir. Böylece beş seçenek gerçekten
+   farklı davetiyeler üretir.
+
+   Tailwind v4 yardımcıları `var(--color-*)` referansı derlediği için
+   değişkenleri kök öğede ezmek tüm arayüzü yeniden renklendirir.
+   ========================================================================== */
+
+:root,
+[data-theme="elegant"] {
+  --display-family: var(--font-cormorant), Georgia, serif;
+  --display-weight: 300;
+  --display-tracking: 0em;
+  --label-tracking: 0.35em;
+  --card-radius: 1.75rem;
+  --button-radius: 2px;
+}
+
+[data-theme="minimal"] {
+  --color-ivory: #f2f2f1;
+  --color-warm-white: #ffffff;
+  --color-sand: #e9e9e7;
+  --color-beige: #dcdcd9;
+  --color-charcoal: #1b1b1a;
+  --color-graphite: #55554f;
+  --color-stone: #8e8e88;
+  --color-gold: #6f6f68;
+  --color-gold-soft: #b8b8b1;
+
+  --display-family: var(--font-inter), system-ui, sans-serif;
+  --display-weight: 300;
+  --display-tracking: -0.02em;
+  --label-tracking: 0.3em;
+  --card-radius: 0.375rem;
+  --button-radius: 2px;
+}
+
+[data-theme="romantic"] {
+  --color-ivory: #f8eeea;
+  --color-warm-white: #fffbf9;
+  --color-sand: #f1ded7;
+  --color-beige: #e6cdc4;
+  --color-charcoal: #4a3530;
+  --color-graphite: #7a5f58;
+  --color-stone: #a8877d;
+  --color-gold: #c0806f;
+  --color-gold-soft: #dcb3a7;
+
+  --display-family: var(--font-cormorant), Georgia, serif;
+  --display-weight: 300;
+  --display-tracking: 0.01em;
+  --label-tracking: 0.4em;
+  --card-radius: 2.5rem;
+  --button-radius: 9999px;
+}
+
+[data-theme="modern"] {
+  --color-ivory: #e9e9e6;
+  --color-warm-white: #ffffff;
+  --color-sand: #dededa;
+  --color-beige: #c9c9c3;
+  --color-charcoal: #0d0d0c;
+  --color-graphite: #3d3d3a;
+  --color-stone: #76766f;
+  --color-gold: #0d0d0c;
+  --color-gold-soft: #9a9a93;
+
+  --display-family: var(--font-inter), system-ui, sans-serif;
+  --display-weight: 500;
+  --display-tracking: -0.035em;
+  --label-tracking: 0.22em;
+  --card-radius: 0.125rem;
+  --button-radius: 0px;
+}
+
+[data-theme="editorial"] {
+  --color-ivory: #f0e9dc;
+  --color-warm-white: #faf6ee;
+  --color-sand: #e5dbc8;
+  --color-beige: #d2c5ad;
+  --color-charcoal: #201e1a;
+  --color-graphite: #4e4940;
+  --color-stone: #857c6c;
+  --color-gold: #964f3d;
+  --color-gold-soft: #c08b78;
+
+  --display-family: var(--font-cormorant), Georgia, serif;
+  --display-weight: 400;
+  --display-tracking: 0em;
+  --label-tracking: 0.45em;
+  --card-radius: 0px;
+  --button-radius: 0px;
+}
+
+/**
+ * Başlık tipografisi.
+ *
+ * `font-display` yardımcısı yerine bu sınıf kullanılır; font ailesi,
+ * ağırlık ve harf aralığının üçü birden temaya bağlıdır.
+ */
+.type-display {
+  font-family: var(--display-family);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
 }
 
 /* ==========================================================================
@@ -105,6 +210,53 @@ body {
   .card-stack {
     --card-header: 3.75rem;
     --stack-gap: 1.25rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Kart geçiş hareketi
+
+   `--enter` kartın yerine oturma ilerlemesidir: 0 = henüz aşağıda,
+   1 = yapıştığı yerde. Değeri `CardStack` her kaydırma karesinde yazar.
+
+   Hareket kartın kendisine değil içeriğine uygulanır — yapışkan öğeye
+   transform vermek sticky davranışını riske atar.
+   -------------------------------------------------------------------------- */
+
+.card-stack > section {
+  --enter: 1;
+  box-shadow: 0 calc(2px + 10px * var(--enter)) calc(16px + 30px * var(--enter))
+    rgb(42 39 36 / calc(0.03 + 0.05 * var(--enter)));
+}
+
+.card-content {
+  opacity: calc(0.1 + 0.9 * var(--enter));
+  transform: translateY(calc((1 - var(--enter)) * 1.75rem));
+}
+
+/* Okunmakta olan kartın başlığı öne çıkar. */
+.card-label {
+  color: var(--color-stone);
+  transition: color 600ms ease;
+}
+
+.card-rule {
+  width: 1.25rem;
+  transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-active="true"] .card-label {
+  color: var(--color-charcoal);
+}
+
+[data-active="true"] .card-rule {
+  width: 2.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-content {
+    opacity: 1;
+    transform: none;
   }
 }
 

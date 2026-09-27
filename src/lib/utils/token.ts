@@ -4,7 +4,8 @@ import { customAlphabet } from "nanoid";
  * Karışması kolay karakterler (0/O, 1/l/I) çıkarılmış alfabe.
  * Davet linki telefonda elle yazılabilir veya sesli okunabilir olmalı.
  */
-const TOKEN_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
+const TOKEN_ALPHABET =
+  "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
 
 export const TOKEN_LENGTH = 10;
 

@@ -1,8 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import type { ReactNode, RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { computeStackFrame } from "@/lib/stack/stack-frame";
 import { trUpper } from "@/lib/utils/text";
 
 export interface StackCard {
@@ -18,17 +19,14 @@ export interface StackCard {
 /**
  * Üst üste yığılan kart akışı.
  *
- * Her kart `position: sticky` ile kendi sırasına göre bir üst boşlukta
+ * Her kart `position: sticky` ile sırasına göre artan bir üst boşlukta
  * durur; bir sonraki kart üzerine kayarken öncekinin yalnızca başlık
- * şeridi görünür kalır. Böylece sayfa aşağı akan bir landing page değil,
+ * şeridi görünür kalır. Sayfa aşağı akan bir landing page değil,
  * ilerledikçe biriken bir deste gibi okunur.
  *
- * Yığılma saf CSS'tir. Bu bileşenin istemci tarafında olmasının tek
- * nedeni, düğün geçtiğinde geri sayım kartını listeden düşürmektir —
- * sayfa statik üretildiği için bu karar sunucuda verilemez.
- *
- * Dikkat: yapışkan öğenin kendisine `transform` uygulanmamalıdır
- * (`Reveal` yalnızca kart içeriğinde kullanılır), aksi halde sticky bozulur.
+ * Dikkat: yapışkan öğenin kendisine `transform` uygulanmaz — hareket
+ * kart *içeriğine* verilir (bkz. `.card-content`), aksi halde sticky
+ * davranışı riske girer. Aynı nedenle atalarda `overflow: hidden` yoktur.
  */
 export function CardStack({
   cards,
@@ -37,8 +35,11 @@ export function CardStack({
   cards: StackCard[];
   weddingStartMs: number;
 }) {
+  const stackRef = useRef<HTMLDivElement>(null);
   const [past, setPast] = useState(false);
 
+  // Düğün geçtiyse geri sayım kartı düşer. Sayfa statik üretildiği için
+  // bu karar sunucuda verilemez.
   useEffect(() => {
     const check = () => setPast(Date.now() >= weddingStartMs);
     check();
@@ -49,14 +50,19 @@ export function CardStack({
 
   const visible = past ? cards.filter((card) => !card.hideWhenPast) : cards;
 
+  useScrollProgress(stackRef, visible.length);
+
   return (
-    <div className="card-stack relative -mt-10 px-4 pb-10 sm:px-6 sm:-mt-16">
+    <div
+      ref={stackRef}
+      className="card-stack relative -mt-10 px-4 pb-10 sm:-mt-16 sm:px-6"
+    >
       {visible.map((card, index) => (
         <section
           key={card.id}
           id={card.id}
           aria-labelledby={`${card.id}-label`}
-          className="sticky mx-auto mb-4 max-w-5xl overflow-hidden rounded-[1.5rem] border border-beige bg-warm-white shadow-[0_6px_36px_rgba(42,39,36,0.06)] sm:mb-5 sm:rounded-[1.75rem]"
+          className="sticky mx-auto mb-4 max-w-5xl overflow-hidden rounded-(--card-radius) border border-beige bg-warm-white sm:mb-5"
           style={{
             top: `calc(${index} * var(--card-header) + var(--stack-gap))`,
             zIndex: index + 1,
@@ -64,10 +70,13 @@ export function CardStack({
         >
           <header className="flex h-(--card-header) items-center justify-between gap-4 border-b border-beige px-6 sm:px-10">
             <div className="flex min-w-0 items-center gap-3">
-              <span aria-hidden className="h-px w-6 shrink-0 bg-gold-soft" />
+              <span
+                aria-hidden
+                className="card-rule h-px shrink-0 bg-gold-soft"
+              />
               <h2
                 id={`${card.id}-label`}
-                className="truncate text-[0.65rem] tracking-[0.35em] text-stone"
+                className="card-label truncate text-[0.65rem] tracking-(--label-tracking)"
               >
                 {trUpper(card.label)}
               </h2>
@@ -78,7 +87,7 @@ export function CardStack({
                 href={card.action.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="shrink-0 rounded-full border border-charcoal/20 px-5 py-2 text-[0.6rem] tracking-[0.2em] text-charcoal transition-colors duration-300 hover:border-gold hover:text-gold"
+                className="shrink-0 rounded-(--button-radius) border border-charcoal/20 px-5 py-2 text-[0.6rem] tracking-[0.2em] text-charcoal transition-colors duration-300 hover:border-gold hover:text-gold"
               >
                 {trUpper(card.action.label)}
                 <span aria-hidden className="ml-1.5">
@@ -89,10 +98,68 @@ export function CardStack({
           </header>
 
           <div className="flex min-h-[62svh] items-center justify-center px-6 py-14 sm:px-10 sm:py-20">
-            <div className="w-full max-w-xl">{card.content}</div>
+            <div className="card-content w-full max-w-xl">{card.content}</div>
           </div>
         </section>
       ))}
     </div>
   );
+}
+
+/**
+ * Her kaydırma karesinde kartların yerine oturma ilerlemesini (`--enter`)
+ * ve okunmakta olan kartı (`data-active`) günceller.
+ *
+ * Kütüphane kullanılmaz: rAF ile sınırlanmış tek bir pasif dinleyici yeter.
+ */
+function useScrollProgress(
+  stackRef: RefObject<HTMLDivElement | null>,
+  cardCount: number,
+) {
+  useEffect(() => {
+    const stack = stackRef.current;
+    if (!stack) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+
+      const sections = Array.from(
+        stack.querySelectorAll<HTMLElement>(":scope > section"),
+      );
+
+      // DOM okuması burada, hesap saf fonksiyonda (test edilebilir).
+      const geometry = sections.map((section) => ({
+        top: section.getBoundingClientRect().top,
+        pinTop: Number.parseFloat(getComputedStyle(section).top) || 0,
+      }));
+
+      const { enter, activeIndex } = computeStackFrame(
+        geometry,
+        window.innerHeight,
+      );
+
+      for (const [index, section] of sections.entries()) {
+        section.style.setProperty("--enter", enter[index].toFixed(3));
+        section.dataset.active = String(index === activeIndex);
+      }
+    };
+
+    const schedule = () => {
+      if (frame === 0) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      if (frame !== 0) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [stackRef, cardCount]);
 }

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { TOKEN_LENGTH, generateToken, isValidTokenFormat } from "@/lib/utils/token";
+import {
+  TOKEN_LENGTH,
+  generateToken,
+  isValidTokenFormat,
+} from "@/lib/utils/token";
 
 describe("generateToken", () => {
   it("sabit uzunlukta token üretir", () => {

@@ -1,4 +1,4 @@
-import { Hairline, Reveal } from "@/components/invitation/primitives";
+import { Hairline } from "@/components/invitation/primitives";
 import { formatLongDate, formatWeekday } from "@/lib/utils/date";
 import type { Wedding } from "@/types";
 
@@ -10,8 +10,8 @@ import type { Wedding } from "@/types";
  */
 export function WeddingDetails({ wedding }: { wedding: Wedding }) {
   return (
-    <Reveal className="flex flex-col items-center text-center">
-      <p className="font-display text-4xl font-light leading-tight text-charcoal sm:text-5xl">
+    <div className="flex flex-col items-center text-center">
+      <p className="type-display text-4xl leading-tight text-charcoal sm:text-5xl">
         {formatLongDate(wedding.eventDate)}
       </p>
       <p className="mt-3 text-xs tracking-[0.3em] text-stone">
@@ -20,13 +20,13 @@ export function WeddingDetails({ wedding }: { wedding: Wedding }) {
 
       <Hairline className="my-10 w-10" />
 
-      <p className="font-display text-4xl font-light text-charcoal sm:text-5xl">
+      <p className="type-display text-4xl text-charcoal sm:text-5xl">
         {wedding.eventTime}
       </p>
 
       <Hairline className="my-10 w-10" />
 
-      <p className="font-display text-3xl font-light text-charcoal sm:text-4xl">
+      <p className="type-display text-3xl text-charcoal sm:text-4xl">
         {wedding.venueName}
       </p>
 
@@ -35,6 +35,6 @@ export function WeddingDetails({ wedding }: { wedding: Wedding }) {
           {wedding.venueAddress}
         </address>
       ) : null}
-    </Reveal>
+    </div>
   );
 }
