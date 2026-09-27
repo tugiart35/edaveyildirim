@@ -86,6 +86,25 @@ body {
   transform: none;
 }
 
+/* Hero'daki kaydırma ipucu: ince çizgi boyunca akan altın vurgu. */
+@keyframes scroll-hint {
+  0% {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(280%);
+    opacity: 0;
+  }
+}
+
+.scroll-hint {
+  animation: scroll-hint 2600ms cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
