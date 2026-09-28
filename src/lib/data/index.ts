@@ -1,170 +1,35 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
-
-import { loadStore, withStore } from "@/lib/data/json-store";
-import { generateToken } from "@/lib/utils/token";
-import type {
-  GuestInput,
-  RsvpInput,
-  WeddingInput,
-} from "@/lib/validation/schemas";
-import type { Guest, GuestWithRsvp, Rsvp, Wedding } from "@/types";
+import { jsonRepository } from "@/lib/data/json-repository";
+import { isSupabaseConfigured } from "@/lib/data/supabase-client";
+import { supabaseRepository } from "@/lib/data/supabase-repository";
+import type { WeddingStore } from "@/lib/data/store";
 
 /**
  * Uygulamanın tek veri erişim noktası.
  *
- * Arayüz kodu yalnızca bu modülü tanır. Frontend fazında altta bir JSON
- * dosyası vardır; backend fazında bu dosyanın içi Supabase çağrılarıyla
- * değiştirilecek, imzalar aynı kalacaktır.
- */
-
-/* -------------------------------------------------------------------------- */
-/*                                   Wedding                                  */
-/* -------------------------------------------------------------------------- */
-
-export async function getWedding(): Promise<Wedding> {
-  const store = await loadStore();
-  return store.wedding;
-}
-
-export async function updateWedding(input: WeddingInput): Promise<Wedding> {
-  return withStore((store) => {
-    store.wedding = {
-      ...store.wedding,
-      ...input,
-      mapsUrl: input.mapsUrl || null,
-      theme: input.theme as Wedding["theme"],
-      updatedAt: new Date().toISOString(),
-    };
-    return store.wedding;
-  });
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                    Guests                                  */
-/* -------------------------------------------------------------------------- */
-
-export async function listGuests(): Promise<GuestWithRsvp[]> {
-  const store = await loadStore();
-  const rsvpByGuest = new Map(store.rsvps.map((rsvp) => [rsvp.guestId, rsvp]));
-
-  return store.guests
-    .map((guest) => ({ ...guest, rsvp: rsvpByGuest.get(guest.id) ?? null }))
-    .sort((a, b) => a.name.localeCompare(b.name, "tr"));
-}
-
-export async function getGuestByToken(
-  token: string,
-): Promise<GuestWithRsvp | null> {
-  const store = await loadStore();
-  const guest = store.guests.find((candidate) => candidate.token === token);
-  if (!guest) return null;
-
-  const rsvp = store.rsvps.find((candidate) => candidate.guestId === guest.id);
-  return { ...guest, rsvp: rsvp ?? null };
-}
-
-export async function getGuestById(id: string): Promise<GuestWithRsvp | null> {
-  const store = await loadStore();
-  const guest = store.guests.find((candidate) => candidate.id === id);
-  if (!guest) return null;
-
-  const rsvp = store.rsvps.find((candidate) => candidate.guestId === guest.id);
-  return { ...guest, rsvp: rsvp ?? null };
-}
-
-export async function createGuest(input: GuestInput): Promise<Guest> {
-  return withStore((store) => {
-    const now = new Date().toISOString();
-
-    let token = generateToken();
-    while (store.guests.some((guest) => guest.token === token)) {
-      token = generateToken();
-    }
-
-    const guest: Guest = {
-      id: randomUUID(),
-      weddingId: store.wedding.id,
-      name: input.name,
-      phone: input.phone,
-      groupName: input.groupName,
-      invitationLimit: input.invitationLimit,
-      token,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    store.guests.push(guest);
-    return guest;
-  });
-}
-
-export async function updateGuest(
-  id: string,
-  input: GuestInput,
-): Promise<Guest> {
-  return withStore((store) => {
-    const guest = store.guests.find((candidate) => candidate.id === id);
-    if (!guest) throw new Error(`Davetli bulunamadı: ${id}`);
-
-    // Token asla değişmez — paylaşılmış linkler çalışmaya devam etmeli.
-    guest.name = input.name;
-    guest.phone = input.phone;
-    guest.groupName = input.groupName;
-    guest.invitationLimit = input.invitationLimit;
-    guest.updatedAt = new Date().toISOString();
-
-    return guest;
-  });
-}
-
-export async function deleteGuest(id: string): Promise<void> {
-  await withStore((store) => {
-    store.guests = store.guests.filter((guest) => guest.id !== id);
-    store.rsvps = store.rsvps.filter((rsvp) => rsvp.guestId !== id);
-  });
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                    RSVP                                    */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Davetlinin cevabını kaydeder veya günceller.
+ * Supabase yapılandırılmışsa Postgres, değilse geliştirme için JSON
+ * dosyası kullanılır. Arayüz kodu bu ayrımı görmez — iki implementasyon
+ * da `WeddingStore` arayüzünü uygular.
  *
- * Her davetli için en fazla bir RSVP kaydı tutulur. İlk cevabın zamanı
- * (`respondedAt`) sonraki güncellemelerde korunur.
+ * Böylece proje veritabanı olmadan da çalışır; anahtarlar `.env.local`
+ * dosyasına eklendiği anda Postgres devreye girer.
  */
-export async function saveRsvp(
-  guestId: string,
-  input: RsvpInput,
-): Promise<Rsvp> {
-  return withStore((store) => {
-    const now = new Date().toISOString();
-    const existing = store.rsvps.find((rsvp) => rsvp.guestId === guestId);
+const store: WeddingStore = isSupabaseConfigured()
+  ? supabaseRepository
+  : jsonRepository;
 
-    if (existing) {
-      existing.status = input.status;
-      existing.attendingCount = input.attendingCount;
-      existing.note = input.note;
-      existing.updatedAt = now;
-      return existing;
-    }
+/** Hangi deponun etkin olduğunu gösterir (kurulum ekranları için). */
+export const activeStore = isSupabaseConfigured() ? "supabase" : "json";
 
-    const rsvp: Rsvp = {
-      id: randomUUID(),
-      guestId,
-      status: input.status,
-      attendingCount: input.attendingCount,
-      adultCount: null,
-      childCount: null,
-      note: input.note,
-      respondedAt: now,
-      updatedAt: now,
-    };
+export const getWedding = store.getWedding;
+export const updateWedding = store.updateWedding;
 
-    store.rsvps.push(rsvp);
-    return rsvp;
-  });
-}
+export const listGuests = store.listGuests;
+export const getGuestByToken = store.getGuestByToken;
+export const getGuestById = store.getGuestById;
+export const createGuest = store.createGuest;
+export const updateGuest = store.updateGuest;
+export const deleteGuest = store.deleteGuest;
+
+export const saveRsvp = store.saveRsvp;
