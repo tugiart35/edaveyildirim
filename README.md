@@ -75,7 +75,7 @@ Hepsi `.env.example` içinde açıklanmıştır. Özet:
 
 | Değişken | Zorunlu | Açıklama |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | evet | Davet bağlantıları bu adresle üretilir |
+| `SITE_URL` | evet | Davet bağlantıları bu adresle üretilir |
 | `ADMIN_EMAIL` | evet | Panel girişi |
 | `ADMIN_PASSWORD_HASH` | evet | `npm run hash-password` çıktısı |
 | `AUTH_SECRET` | evet | Oturum çerezini imzalar |
@@ -126,15 +126,14 @@ Bu yapılmazsa **her dağıtımda davetli listesi silinir.**
 **3. Ortam değişkenleri**
 
 ```
-NEXT_PUBLIC_SITE_URL=https://davetiye.alanadiniz.com
+SITE_URL=https://edaveyildirim.com
 DATABASE_FILE=/data/wedding.db
 ADMIN_EMAIL=...
 ADMIN_PASSWORD_HASH=...
 AUTH_SECRET=...
 ```
 
-`NEXT_PUBLIC_SITE_URL` derleme sırasında gömülür; Dokploy'da *Build
-Args* olarak da tanımlayın.
+Hepsi çalışma anında okunur; build arg tanımlamaya gerek yok.
 
 **4. Domain ve HTTPS**
 

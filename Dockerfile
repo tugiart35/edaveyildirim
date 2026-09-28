@@ -22,10 +22,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Davet linkleri bu adresle üretilir ve derleme sırasında gömülür.
-ARG NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
