@@ -13,6 +13,9 @@
     "hash-password": "node scripts/hash-password.mjs",
     "seed": "node --experimental-strip-types scripts/seed.mjs"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "dependencies": {
     "clsx": "^2.1.1",
     "nanoid": "^6.0.1",

@@ -109,19 +109,29 @@ dosyalarının üçünü birden kopyalayın.
 
 ## Dağıtım (Dokploy)
 
-Depoda hazır bir `Dockerfile` var (Next.js standalone çıktısı, ~50 MB).
+Dokploy **Nixpacks** ile derler; ayrı bir Dockerfile gerekmez.
 
 **1. Uygulamayı oluştur**
 
-Dokploy → *Create Application* → depoyu bağla. Build type: **Dockerfile**.
+`Create Application` → GitHub reposunu bağla → Build Type: **Nixpacks**
 
-**2. Kalıcı disk bağla** — en önemli adım
+Node sürümü `package.json` içindeki `engines.node` ve `.nvmrc` ile 22'ye
+sabitlenmiştir. Bu olmadan Nixpacks Node 18 seçer ve Next.js 16
+derlenmez.
+
+**2. Kalıcı disk bağla** — atlanmaması gereken adım
+
+`Advanced → Volumes → Add Mount`
 
 | Alan | Değer |
 |---|---|
-| Mount path | `/data` |
+| Type | Bind Mount |
+| Host Path | `../files/data` |
+| Mount Path | `/data` |
 
-Bu yapılmazsa **her dağıtımda davetli listesi silinir.**
+Bu bir "ek disk" değil, VPS'in kendi diskindeki bir klasördür. Container
+dosya sistemi geçicidir: bağlanmazsa **her dağıtımda davetli listesi ve
+tüm RSVP cevapları silinir.**
 
 **3. Ortam değişkenleri**
 
@@ -137,15 +147,15 @@ Hepsi çalışma anında okunur; build arg tanımlamaya gerek yok.
 
 **4. Domain ve HTTPS**
 
-Dokploy'un domain ayarından alan adını bağlayın, Let's Encrypt'i açın.
+Domain ayarından alan adını bağla, port **3000**, Let's Encrypt açık.
 Oturum çerezi production'da `secure` işaretlidir — HTTPS olmadan panele
 giriş yapılamaz.
 
 **5. İlk açılış**
 
 Şema ve yer tutucu düğün kaydı ilk istekte oluşur. `/admin` adresinden
-girip **Düğün Bilgileri** sayfasından gerçek bilgileri yazın, sonra
-davetlileri ekleyin.
+girip **Düğün Bilgileri** sayfasından gerçek bilgileri yaz, sonra
+davetlileri ekle.
 
 ---
 
