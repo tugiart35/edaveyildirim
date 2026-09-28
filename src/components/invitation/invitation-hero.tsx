@@ -74,18 +74,18 @@ function CoverArtwork({
         className="h-auto w-auto max-h-[min(54vh,32rem)] max-w-full object-contain"
       />
 
+      {/*
+        Davet cümlesi burada gösterilmez. Çizim kapak davetin sözünü
+        kendi el yazısıyla söylüyor; altına dizilen matbu bir cümle
+        aynı şeyi ikinci kez, başka bir sesle tekrar ediyordu. Yalnızca
+        tarih kalır. (Cümle yazılı kapakta hâlâ görünür.)
+      */}
       <div className="flex flex-col items-center text-center">
         <Hairline className="w-10" />
 
         <p className="mt-6 text-xs tracking-(--label-tracking) text-graphite sm:text-sm">
           {trUpper(formatLongDate(wedding.eventDate))}
         </p>
-
-        {wedding.invitationText ? (
-          <p className="mt-5 max-w-sm text-balance text-sm leading-loose text-graphite">
-            {wedding.invitationText}
-          </p>
-        ) : null}
       </div>
 
       <ScrollHint tone="light" />

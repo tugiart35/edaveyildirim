@@ -198,7 +198,11 @@ export function WeddingSettingsForm({ wedding }: { wedding: Wedding }) {
       </Section>
 
       <Section title="Davetiye metni">
-        <Field label="Davet cümlesi" htmlFor="invitationText">
+        <Field
+          label="Davet cümlesi"
+          htmlFor="invitationText"
+          hint="Yalnızca yazılı kapakta görünür. Kapak görseli seçiliyse çizim bu sözü kendi taşıdığı için gösterilmez."
+        >
           <textarea
             id="invitationText"
             name="invitationText"
