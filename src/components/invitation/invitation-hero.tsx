@@ -3,17 +3,99 @@ import Image from "next/image";
 import { Hairline } from "@/components/invitation/primitives";
 import { formatLongDate } from "@/lib/utils/date";
 import { trUpper } from "@/lib/utils/text";
-import { coupleNames, monogram } from "@/lib/utils/wedding";
+import { coupleNames, coupleTitle, monogram } from "@/lib/utils/wedding";
 import type { Wedding } from "@/types";
 
 /**
- * Tam ekran açılış.
+ * Davetiyenin kapağı.
  *
- * Fotoğraf varsa tüm ekranı kaplar ve üzerine ivory bir perde çekilir;
- * yoksa çiftin baş harflerinden monogram gösterilir. Her iki durumda da
- * tipografi aynı kalır — davetiyenin kimliği fotoğrafa bağlı değildir.
+ * Üç görünüm vardır:
+ *
+ * 1. **Kapak çizimi** (`coverImage`) — çizim kendi zeminiyle bir bütündür,
+ *    kırpılmadan ortalanır. Çift isimleri genelde çizimin içinde olduğu
+ *    için tipografiyle tekrar edilmez.
+ * 2. **Fotoğraf** (`primaryImage`) — tüm ekranı kaplar, üzerine yumuşak
+ *    bir perde ve tipografi biner.
+ * 3. **Hiçbiri** — baş harflerden monogram.
  */
 export function InvitationHero({
+  wedding,
+  guestName,
+}: {
+  wedding: Wedding;
+  guestName?: string;
+}) {
+  if (wedding.coverImage) {
+    return (
+      <CoverArtwork
+        wedding={wedding}
+        guestName={guestName}
+        source={wedding.coverImage}
+      />
+    );
+  }
+
+  return <TypographicCover wedding={wedding} guestName={guestName} />;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Çizim kapak.
+ *
+ * Zemin `warm-white`: çizimlerin kağıt rengiyle (#fefdf7) neredeyse
+ * birebir aynı, böylece görselin kenarları belli olmaz ve çizim sayfanın
+ * üstünde bir dikdörtgen gibi durmaz.
+ */
+function CoverArtwork({
+  wedding,
+  guestName,
+  source,
+}: {
+  wedding: Wedding;
+  guestName?: string;
+  source: string;
+}) {
+  return (
+    <section className="relative flex min-h-dvh flex-col items-center justify-center gap-8 bg-paper px-6 pt-14 pb-24 sm:gap-10 sm:pt-16 sm:pb-28">
+      <Greeting name={guestName} />
+
+      {/*
+        Çizim asla kırpılmaz. Yükseklik viewport'a göre sınırlanır ki
+        alttaki tarih ve davet metni ekrandan taşmasın.
+      */}
+      <div className="relative h-[min(52vh,30rem)] w-full max-w-xs sm:max-w-sm">
+        <Image
+          src={source}
+          alt={`${coupleTitle(wedding)} düğün davetiyesi`}
+          fill
+          priority
+          sizes="(min-width: 640px) 24rem, 20rem"
+          className="object-contain"
+        />
+      </div>
+
+      <div className="flex flex-col items-center text-center">
+        <Hairline className="w-10" />
+
+        <p className="mt-6 text-xs tracking-(--label-tracking) text-graphite sm:text-sm">
+          {trUpper(formatLongDate(wedding.eventDate))}
+        </p>
+
+        {wedding.invitationText ? (
+          <p className="mt-5 max-w-sm text-balance text-sm leading-loose text-graphite">
+            {wedding.invitationText}
+          </p>
+        ) : null}
+      </div>
+
+      <ScrollHint tone="light" />
+    </section>
+  );
+}
+
+/** Fotoğraflı ya da monogramlı klasik kapak. */
+function TypographicCover({
   wedding,
   guestName,
 }: {
@@ -47,15 +129,7 @@ export function InvitationHero({
       />
 
       <div className="relative flex w-full max-w-lg flex-col items-center text-center">
-        {guestName ? (
-          <p className="mb-10 text-sm leading-relaxed text-graphite">
-            Sevgili{" "}
-            <span className="type-display text-xl text-charcoal">
-              {guestName}
-            </span>
-            ,
-          </p>
-        ) : null}
+        <Greeting name={guestName} className="mb-10" />
 
         <p className="text-[0.7rem] tracking-[0.5em] text-gold">
           {monogram(wedding)}
@@ -86,18 +160,31 @@ export function InvitationHero({
         ) : null}
       </div>
 
-      <ScrollHint hasPhoto={hasPhoto} />
+      <ScrollHint tone={hasPhoto ? "onPhoto" : "light"} />
     </section>
   );
 }
 
+/* -------------------------------------------------------------------------- */
+
+function Greeting({ name, className }: { name?: string; className?: string }) {
+  if (!name) return null;
+
+  return (
+    <p className={`text-sm leading-relaxed text-graphite ${className ?? ""}`}>
+      Sevgili <span className="type-display text-xl text-charcoal">{name}</span>
+      ,
+    </p>
+  );
+}
+
 /** Aşağı kaydırmayı ima eden ince çizgi. Dekoratif, ekran okuyucudan gizli. */
-function ScrollHint({ hasPhoto }: { hasPhoto: boolean }) {
+function ScrollHint({ tone }: { tone: "light" | "onPhoto" }) {
   return (
     <span
       aria-hidden
-      className={`absolute bottom-12 left-1/2 block h-14 w-px -translate-x-1/2 overflow-hidden ${
-        hasPhoto ? "bg-charcoal/15" : "bg-beige"
+      className={`absolute bottom-6 left-1/2 block h-10 w-px -translate-x-1/2 overflow-hidden sm:bottom-10 sm:h-14 ${
+        tone === "onPhoto" ? "bg-charcoal/15" : "bg-beige"
       }`}
     >
       <span className="scroll-hint absolute inset-x-0 top-0 block h-5 bg-gold" />

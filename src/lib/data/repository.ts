@@ -10,6 +10,7 @@ import type {
 import type {
   Guest,
   GuestWithRsvp,
+  InvitationPanel,
   NameOrder,
   Rsvp,
   Theme,
@@ -69,7 +70,8 @@ export function createRepository(db: DatabaseSync) {
          event_date = ?, event_time = ?, timezone = ?,
          venue_name = ?, venue_address = ?, maps_url = ?,
          invitation_text = ?, theme = ?,
-         primary_image = ?, gallery_images = ?, music_url = ?,
+         cover_image = ?, primary_image = ?, gallery_images = ?, panels = ?,
+         music_url = ?,
          enable_child_split = ?, updated_at = ?
        WHERE id = ?`,
     ).run(
@@ -84,8 +86,10 @@ export function createRepository(db: DatabaseSync) {
       input.mapsUrl || null,
       input.invitationText,
       input.theme,
+      input.coverImage,
       input.primaryImage,
       JSON.stringify(input.galleryImages),
+      JSON.stringify(input.panels),
       input.musicUrl,
       input.enableChildSplit ? 1 : 0,
       now(),
@@ -280,8 +284,10 @@ interface WeddingRow {
   maps_url: string | null;
   invitation_text: string | null;
   theme: string;
+  cover_image: string | null;
   primary_image: string | null;
   gallery_images: string;
+  panels: string;
   music_url: string | null;
   enable_child_split: number;
   created_at: string;
@@ -337,8 +343,10 @@ function toWedding(row: WeddingRow): Wedding {
     mapsUrl: row.maps_url,
     invitationText: row.invitation_text,
     theme: row.theme as Theme,
+    coverImage: row.cover_image,
     primaryImage: row.primary_image,
     galleryImages: parseGallery(row.gallery_images),
+    panels: parsePanels(row.panels),
     musicUrl: row.music_url,
     enableChildSplit: row.enable_child_split === 1,
     createdAt: row.created_at,
@@ -386,6 +394,35 @@ function toRsvp(row: RsvpRow): Rsvp {
     respondedAt: row.responded_at,
     updatedAt: row.updated_at,
   };
+}
+
+/**
+ * Panel listesi.
+ *
+ * Şema `json_valid` ile korur; yine de biçimi bozuk bir kayıt tüm
+ * davetiyeyi düşürmemeli — tanınmayan girdiler sessizce elenir.
+ */
+function parsePanels(value: string): InvitationPanel[] {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .filter(
+        (item): item is InvitationPanel =>
+          typeof item === "object" &&
+          item !== null &&
+          typeof (item as InvitationPanel).label === "string" &&
+          typeof (item as InvitationPanel).image === "string",
+      )
+      .map((panel) => ({
+        label: panel.label,
+        image: panel.image,
+        countdown: panel.countdown === true,
+      }));
+  } catch {
+    return [];
+  }
 }
 
 /** Şema `json_valid` ile korur; yine de bozuk veri uygulamayı düşürmemeli. */

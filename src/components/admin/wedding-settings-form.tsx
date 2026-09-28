@@ -2,15 +2,18 @@
 
 import { useRef, useState, useTransition } from "react";
 
+import { PanelFields } from "@/components/admin/panel-fields";
 import { ThemePicker } from "@/components/admin/theme-picker";
 import { MAX_GALLERY_IMAGES } from "@/lib/validation/schemas";
-import type { NameOrder, Theme, Wedding } from "@/types";
+import type { InvitationPanel, NameOrder, Theme, Wedding } from "@/types";
 
 export function WeddingSettingsForm({ wedding }: { wedding: Wedding }) {
   const [theme, setTheme] = useState<Theme>(wedding.theme);
   const [nameOrder, setNameOrder] = useState<NameOrder>(wedding.nameOrder);
+  const [coverImage, setCoverImage] = useState(wedding.coverImage ?? "");
   const [primaryImage, setPrimaryImage] = useState(wedding.primaryImage ?? "");
   const [gallery, setGallery] = useState<string[]>(wedding.galleryImages);
+  const [panels, setPanels] = useState<InvitationPanel[]>(wedding.panels);
 
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -37,8 +40,12 @@ export function WeddingSettingsForm({ wedding }: { wedding: Wedding }) {
       mapsUrl: text("mapsUrl") || null,
       invitationText: text("invitationText") || null,
       theme,
+      coverImage: coverImage.trim() || null,
       primaryImage: primaryImage.trim() || null,
       galleryImages: gallery.filter((src) => src.trim() !== ""),
+      panels: panels.filter(
+        (panel) => panel.label.trim() !== "" && panel.image.trim() !== "",
+      ),
       musicUrl: text("musicUrl") || null,
       enableChildSplit: wedding.enableChildSplit,
     };
@@ -202,10 +209,28 @@ export function WeddingSettingsForm({ wedding }: { wedding: Wedding }) {
         </Field>
       </Section>
 
+      <Section title="Çizim panelleri">
+        <PanelFields
+          panels={panels}
+          disabled={isPending}
+          onChange={setPanels}
+        />
+      </Section>
+
       <Section title="Görseller">
         <ImageField
+          id="coverImage"
+          label="Kapak görseli"
+          hint="Davetiyeyi açanın gördüğü ilk şey. Çizim veya tasarım; kırpılmadan, kendi zeminiyle gösterilir. Çift isimlerini içeriyorsa tipografi tekrarlanmaz."
+          value={coverImage}
+          disabled={isPending}
+          onChange={setCoverImage}
+        />
+
+        <ImageField
+          id="primaryImage"
           label="Ana fotoğraf"
-          hint="Davetiyenin açılış ekranı. Boş bırakılırsa baş harflerden monogram gösterilir."
+          hint="Kapak görseli yoksa kullanılır: tüm ekranı kaplar, üzerine isimler biner. İkisi de boşsa baş harflerden monogram gösterilir."
           value={primaryImage}
           disabled={isPending}
           onChange={setPrimaryImage}
@@ -268,12 +293,14 @@ export function WeddingSettingsForm({ wedding }: { wedding: Wedding }) {
 /* -------------------------------------------------------------------------- */
 
 function ImageField({
+  id,
   label,
   hint,
   value,
   disabled,
   onChange,
 }: {
+  id: string;
   label: string;
   hint?: string;
   value: string;
@@ -282,13 +309,13 @@ function ImageField({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor="primaryImage" className="text-sm text-graphite">
+      <label htmlFor={id} className="text-sm text-graphite">
         {label}
       </label>
 
       <div className="flex items-start gap-3">
         <input
-          id="primaryImage"
+          id={id}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder="/mock/hero.jpg"

@@ -30,7 +30,9 @@ beforeEach(() => {
   repo = createRepository(db);
 });
 
-function guestInput(overrides: Partial<Parameters<Repository["createGuest"]>[0]> = {}) {
+function guestInput(
+  overrides: Partial<Parameters<Repository["createGuest"]>[0]> = {},
+) {
   return {
     name: "Ahmet Yılmaz",
     phone: "+905551111111",
@@ -77,7 +79,9 @@ describe("davetli yönetimi", () => {
   });
 
   it("olmayan davetliyi güncellemeye çalışınca hata verir", async () => {
-    await expect(repo.updateGuest(randomUUID(), guestInput())).rejects.toThrow();
+    await expect(
+      repo.updateGuest(randomUUID(), guestInput()),
+    ).rejects.toThrow();
   });
 
   it("davetliyi silince cevabı da silinir", async () => {
@@ -91,9 +95,9 @@ describe("davetli yönetimi", () => {
     await repo.deleteGuest(guest.id);
 
     expect(await repo.getGuestById(guest.id)).toBeNull();
-    const rsvpCount = db
-      .prepare("SELECT COUNT(*) AS n FROM rsvps")
-      .get() as { n: number };
+    const rsvpCount = db.prepare("SELECT COUNT(*) AS n FROM rsvps").get() as {
+      n: number;
+    };
     expect(rsvpCount.n).toBe(0);
   });
 
@@ -259,7 +263,9 @@ describe("veritabanı kuralları", () => {
 
   it("geçersiz tema kabul edilmez", async () => {
     expect(() =>
-      db.prepare("UPDATE weddings SET theme = 'neon' WHERE id = ?").run(WEDDING_ID),
+      db
+        .prepare("UPDATE weddings SET theme = 'neon' WHERE id = ?")
+        .run(WEDDING_ID),
     ).toThrow();
   });
 });
@@ -280,8 +286,10 @@ describe("düğün bilgileri", () => {
       mapsUrl: "https://maps.google.com/?q=test",
       invitationText: "Bizimle olun.",
       theme: "romantic",
+      coverImage: "/design/kapak.jpg",
       primaryImage: "/mock/hero.jpg",
       galleryImages: ["/a.jpg", "/b.jpg"],
+      panels: [{ label: "Düğün", image: "/design/dugun.jpg", countdown: true }],
       musicUrl: null,
       enableChildSplit: false,
     });
@@ -290,6 +298,10 @@ describe("düğün bilgileri", () => {
     expect(updated.brideName).toBe("Eda");
     expect(updated.nameOrder).toBe("groom_first");
     expect(updated.theme).toBe("romantic");
+    expect(updated.coverImage).toBe("/design/kapak.jpg");
+    expect(updated.panels).toEqual([
+      { label: "Düğün", image: "/design/dugun.jpg", countdown: true },
+    ]);
     expect(updated.galleryImages).toEqual(["/a.jpg", "/b.jpg"]);
     expect(updated.enableChildSplit).toBe(false);
   });
@@ -309,12 +321,40 @@ describe("düğün bilgileri", () => {
       mapsUrl: "",
       invitationText: null,
       theme: current.theme,
+      coverImage: null,
       primaryImage: null,
       galleryImages: [],
+      panels: [],
       musicUrl: null,
       enableChildSplit: false,
     });
 
     expect(updated.mapsUrl).toBeNull();
+    expect(updated.coverImage).toBeNull();
+  });
+
+  it("şemaya sonradan eklenen sütun mevcut veritabanına da uygulanır", () => {
+    // cover_image sütunu ilk sürümde yoktu; applyMigrations onu ekler.
+    const columns = db.prepare("PRAGMA table_info(weddings)").all() as Array<{
+      name: string;
+    }>;
+
+    expect(columns.map((column) => column.name)).toContain("cover_image");
+    expect(columns.map((column) => column.name)).toContain("panels");
+  });
+
+  it("panel sayısı sekizi aşamaz", () => {
+    const many = JSON.stringify(
+      Array.from({ length: 9 }, (_, i) => ({
+        label: `P${i}`,
+        image: "/a.jpg",
+      })),
+    );
+
+    expect(() =>
+      db
+        .prepare("UPDATE weddings SET panels = ? WHERE id = ?")
+        .run(many, WEDDING_ID),
+    ).toThrow();
   });
 });

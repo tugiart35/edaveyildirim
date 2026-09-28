@@ -39,6 +39,7 @@ export function getDatabase(): DatabaseSync {
   const db = new DatabaseSync(databaseFile);
   applyPragmas(db);
   db.exec(SCHEMA_SQL);
+  applyMigrations(db);
   ensureWedding(db);
 
   globalForDb.__weddingDb = db;
@@ -90,7 +91,35 @@ export function openDatabase(file: string): DatabaseSync {
   const db = new DatabaseSync(file);
   applyPragmas(db);
   db.exec(SCHEMA_SQL);
+  applyMigrations(db);
   return db;
+}
+
+/**
+ * Şemaya sonradan eklenen sütunlar.
+ *
+ * `CREATE TABLE IF NOT EXISTS` var olan bir tabloyu değiştirmez; yeni
+ * bir sütun eklendiğinde çalışan veritabanları geride kalır. Burası
+ * eksik sütunları tamamlar ve her açılışta güvenle tekrar çalışır.
+ */
+function applyMigrations(db: DatabaseSync): void {
+  addColumn(db, "weddings", "cover_image", "TEXT");
+  addColumn(db, "weddings", "panels", "TEXT NOT NULL DEFAULT '[]'");
+}
+
+function addColumn(
+  db: DatabaseSync,
+  table: string,
+  column: string,
+  definition: string,
+): void {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{
+    name: string;
+  }>;
+
+  if (columns.some((existing) => existing.name === column)) return;
+
+  db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
 }
 
 function applyPragmas(db: DatabaseSync): void {

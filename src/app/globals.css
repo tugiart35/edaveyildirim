@@ -13,6 +13,9 @@
      yığılan kartlar "bölüm" gibi okunur, kart gibi değil. */
   --color-ivory: #f4efe5;
   --color-warm-white: #fdfcfa;
+  /* Çizimlerin kağıt rengi. Kapak görselinin kenarları belli olmasın
+     diye hero zemini birebir bu değerdir. */
+  --color-paper: #fefdf9;
   --color-sand: #ece5d8;
   --color-beige: #ddd3c2;
 

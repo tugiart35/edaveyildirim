@@ -23,6 +23,22 @@ export type RsvpStatus = "attending" | "declined";
 /** UI'da gösterilen üç değerli durum. */
 export type GuestStatus = RsvpStatus | "pending";
 
+/**
+ * Davetiye paneli.
+ *
+ * Her panel, yığındaki bir kart olarak görünür ve içinde bir çizim
+ * taşır. Çizimler tarih, saat, mekân gibi bilgileri kendi içlerinde
+ * barındırabildiği için panel yalnızca etiket ve görselden oluşur.
+ */
+export interface InvitationPanel {
+  /** Kart başlık şeridindeki etiket. */
+  label: string;
+  /** Çizim yolu. */
+  image: string;
+  /** Açıksa çizimin altında düğüne kalan süre gösterilir. */
+  countdown?: boolean;
+}
+
 export interface Wedding {
   id: string;
   brideName: string;
@@ -39,8 +55,19 @@ export interface Wedding {
   mapsUrl: string | null;
   invitationText: string | null;
   theme: Theme;
+  /**
+   * Kapak çizimi/görseli.
+   *
+   * `primaryImage`'dan farklıdır: fotoğraf tüm ekranı kaplar ve üzerine
+   * tipografi bindirilir; kapak görseli ise kendi zeminiyle bir bütündür
+   * ve kırpılmadan, ortalanmış olarak gösterilir. Çift isimlerini zaten
+   * içeriyorsa tipografi tekrar edilmez.
+   */
+  coverImage: string | null;
   primaryImage: string | null;
   galleryImages: string[];
+  /** Sırasıyla gösterilen çizim kartları. */
+  panels: InvitationPanel[];
   musicUrl: string | null;
   /** Yetişkin/çocuk ayrımı. Şema hazır, arayüz sonraki turda. */
   enableChildSplit: boolean;

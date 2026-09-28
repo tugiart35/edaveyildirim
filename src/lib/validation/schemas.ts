@@ -4,6 +4,7 @@ import { THEMES } from "@/types";
 
 export const MAX_NOTE_LENGTH = 500;
 export const MAX_GALLERY_IMAGES = 5;
+export const MAX_PANELS = 8;
 
 /* -------------------------------------------------------------------------- */
 /*                                   Wedding                                  */
@@ -27,8 +28,18 @@ export const weddingInputSchema = z.object({
     .nullable(),
   invitationText: z.string().trim().max(600).nullable(),
   theme: z.enum(THEMES as unknown as [string, ...string[]]),
+  coverImage: z.string().nullable(),
   primaryImage: z.string().nullable(),
   galleryImages: z.array(z.string()).max(MAX_GALLERY_IMAGES),
+  panels: z
+    .array(
+      z.object({
+        label: z.string().trim().min(1, "Panel etiketi gerekli.").max(40),
+        image: z.string().trim().min(1, "Panel görseli gerekli."),
+        countdown: z.boolean().optional(),
+      }),
+    )
+    .max(MAX_PANELS),
   musicUrl: z.string().nullable(),
   enableChildSplit: z.boolean(),
 });

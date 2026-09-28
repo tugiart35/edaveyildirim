@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
+import { ArtworkPanel } from "@/components/invitation/artwork-panel";
 import { CardStack, type StackCard } from "@/components/invitation/card-stack";
-import { Countdown } from "@/components/invitation/countdown";
 import { InvitationFooter } from "@/components/invitation/invitation-footer";
 import { InvitationHero } from "@/components/invitation/invitation-hero";
 import { PhotoGallery } from "@/components/invitation/photo-gallery";
@@ -17,6 +17,9 @@ import type { Wedding } from "@/types";
  * yığılan bir kart olur. Generic (`/`) ve kişiye özel (`/invite/[token]`)
  * sayfalar aynı kartları paylaşır, tek fark selamlama ve katılım kartının
  * içeriğidir.
+ *
+ * Kart sırası: önce çizim panelleri (ayarlardaki sırayla), sonra galeri,
+ * düğün bilgileri ve katılım.
  */
 export function InvitationPage({
   wedding,
@@ -29,14 +32,12 @@ export function InvitationPage({
 }) {
   const weddingStartMs = weddingStartTimestamp(wedding);
 
-  const cards: StackCard[] = [
-    {
-      id: "geri-sayim",
-      label: "Geri Sayım",
-      hideWhenPast: true,
-      content: <Countdown targetMs={weddingStartMs} />,
-    },
-  ];
+  const cards: StackCard[] = wedding.panels.map((panel, index) => ({
+    id: `panel-${index + 1}`,
+    label: panel.label,
+    wide: true,
+    content: <ArtworkPanel panel={panel} weddingStartMs={weddingStartMs} />,
+  }));
 
   if (wedding.galleryImages.length > 0) {
     cards.push({
@@ -67,7 +68,7 @@ export function InvitationPage({
       <ScrollReveal />
       <main>
         <InvitationHero wedding={wedding} guestName={guestName} />
-        <CardStack cards={cards} weddingStartMs={weddingStartMs} />
+        <CardStack cards={cards} />
       </main>
       <InvitationFooter wedding={wedding} />
     </>

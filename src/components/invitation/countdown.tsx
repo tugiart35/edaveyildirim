@@ -13,18 +13,23 @@ const UNITS: Array<{ key: keyof CountdownParts; label: string }> = [
 /**
  * Düğüne kalan süre.
  *
- * Sayılar yalnızca tarayıcıda hesaplanır: sayfa statik olarak önceden
- * üretildiği için sunucudaki `Date.now()` build zamanına donar.
- * Sayılar gelene kadar görünmez bir yer tutucu aynı yeri kaplar, böylece
- * hidrasyon sırasında düzen kaymaz.
+ * Bir çizim panelinin altında gösterilir; kendi başlığı ve kabuğu yoktur,
+ * onları panel sağlar.
  *
- * Düğün geçtiğinde kartın tamamı `CardStack` tarafından kaldırılır.
+ * Sayılar yalnızca tarayıcıda hesaplanır: sayfa her istekte üretilse de
+ * sunucu ile ziyaretçinin saati farklı olabilir ve hidrasyon uyuşmazlığı
+ * çıkardı. Sayılar gelene kadar görünmez bir yer tutucu aynı yeri kaplar,
+ * böylece düzen kaymaz.
+ *
+ * Düğün tarihi geçmişse hiçbir şey gösterilmez.
  */
 export function Countdown({ targetMs }: { targetMs: number }) {
-  const [parts, setParts] = useState<CountdownParts | null>(null);
+  const [state, setState] = useState<{ parts: CountdownParts | null } | null>(
+    null,
+  );
 
   useEffect(() => {
-    const tick = () => setParts(countdownTo(targetMs, Date.now()));
+    const tick = () => setState({ parts: countdownTo(targetMs, Date.now()) });
     tick();
 
     // Dakika hassasiyeti yeterli; saniyede bir render etmeye gerek yok.
@@ -32,27 +37,27 @@ export function Countdown({ targetMs }: { targetMs: number }) {
     return () => clearInterval(interval);
   }, [targetMs]);
 
-  return (
-    <div className="flex flex-col items-center text-center">
-      <p className="type-display text-2xl text-graphite sm:text-3xl">
-        Düğünümüze
-      </p>
+  // Düğün günü geldi: geri sayım artık anlamlı değil.
+  if (state !== null && state.parts === null) return null;
 
-      <div className="mt-12 flex items-start justify-center gap-8 sm:gap-16">
-        {UNITS.map((unit) => (
-          <div key={unit.key} className="flex flex-col items-center">
-            <span
-              className="type-display text-6xl leading-none tabular-nums text-charcoal sm:text-7xl"
-              style={parts === null ? { visibility: "hidden" } : undefined}
-            >
-              {parts === null ? "00" : String(parts[unit.key]).padStart(2, "0")}
-            </span>
-            <span className="mt-4 text-[0.6rem] tracking-[0.3em] text-stone">
-              {unit.label}
-            </span>
-          </div>
-        ))}
-      </div>
+  const parts = state?.parts ?? null;
+
+  return (
+    <div className="flex items-start justify-center gap-8 sm:gap-14">
+      {UNITS.map((unit) => (
+        <div key={unit.key} className="flex flex-col items-center">
+          <span
+            className="type-display text-4xl leading-none tabular-nums text-charcoal sm:text-5xl"
+            // Sayılar gelene kadar yer tutucu görünmez durur.
+            style={parts === null ? { visibility: "hidden" } : undefined}
+          >
+            {parts === null ? "00" : String(parts[unit.key]).padStart(2, "0")}
+          </span>
+          <span className="mt-3 text-[0.6rem] tracking-[0.3em] text-stone">
+            {unit.label}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

@@ -26,8 +26,10 @@ CREATE TABLE IF NOT EXISTS weddings (
   maps_url           TEXT,
   invitation_text    TEXT,
   theme              TEXT    NOT NULL DEFAULT 'elegant',
+  cover_image        TEXT,
   primary_image      TEXT,
   gallery_images     TEXT    NOT NULL DEFAULT '[]',
+  panels             TEXT    NOT NULL DEFAULT '[]',
   music_url          TEXT,
   enable_child_split INTEGER NOT NULL DEFAULT 0,
   created_at         TEXT    NOT NULL,
@@ -43,7 +45,12 @@ CREATE TABLE IF NOT EXISTS weddings (
   -- Galeri bir JSON dizisi olmalı ve en fazla 5 fotoğraf içermeli.
   CHECK (json_valid(gallery_images)),
   CHECK (json_type(gallery_images) = 'array'),
-  CHECK (json_array_length(gallery_images) <= 5)
+  CHECK (json_array_length(gallery_images) <= 5),
+
+  -- Davetiye panelleri: her biri bir çizim kartı.
+  CHECK (json_valid(panels)),
+  CHECK (json_type(panels) = 'array'),
+  CHECK (json_array_length(panels) <= 8)
 );
 
 CREATE TABLE IF NOT EXISTS guests (

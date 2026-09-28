@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode, RefObject } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { computeStackFrame } from "@/lib/stack/stack-frame";
 import { trUpper } from "@/lib/utils/text";
@@ -12,8 +12,6 @@ export interface StackCard {
   content: ReactNode;
   /** Kart başlığının sağındaki opsiyonel bağlantı. */
   action?: { href: string; label: string };
-  /** Düğün tarihi geçtiğinde bu kart tamamen kaldırılır. */
-  hideWhenPast?: boolean;
   /**
    * İçeriği okuma sütununa sıkıştırmaz, kartın tüm genişliğini verir.
    * Galeri gibi görsel içerikler içindir; metin bloklarında kullanılmaz.
@@ -33,36 +31,17 @@ export interface StackCard {
  * kart *içeriğine* verilir (bkz. `.card-content`), aksi halde sticky
  * davranışı riske girer. Aynı nedenle atalarda `overflow: hidden` yoktur.
  */
-export function CardStack({
-  cards,
-  weddingStartMs,
-}: {
-  cards: StackCard[];
-  weddingStartMs: number;
-}) {
+export function CardStack({ cards }: { cards: StackCard[] }) {
   const stackRef = useRef<HTMLDivElement>(null);
-  const [past, setPast] = useState(false);
 
-  // Düğün geçtiyse geri sayım kartı düşer. Sayfa statik üretildiği için
-  // bu karar sunucuda verilemez.
-  useEffect(() => {
-    const check = () => setPast(Date.now() >= weddingStartMs);
-    check();
-
-    const interval = setInterval(check, 30_000);
-    return () => clearInterval(interval);
-  }, [weddingStartMs]);
-
-  const visible = past ? cards.filter((card) => !card.hideWhenPast) : cards;
-
-  useScrollProgress(stackRef, visible.length);
+  useScrollProgress(stackRef, cards.length);
 
   return (
     <div
       ref={stackRef}
       className="card-stack relative -mt-10 px-4 pb-10 sm:-mt-16 sm:px-6"
     >
-      {visible.map((card, index) => (
+      {cards.map((card, index) => (
         <section
           key={card.id}
           id={card.id}
