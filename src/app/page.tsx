@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { InvitationPage } from "@/components/invitation/invitation-page";
 import { getWedding } from "@/lib/data";
-import { coupleTitle } from "@/lib/utils/wedding";
+import { shareMetadata } from "@/lib/share-metadata";
 
 /**
  * Davetiye her istekte veritabanından üretilir.
@@ -15,13 +15,7 @@ import { coupleTitle } from "@/lib/utils/wedding";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const wedding = await getWedding();
-  const couple = coupleTitle(wedding);
-
-  return {
-    title: `${couple} | Düğün Davetiyesi`,
-    description: `${couple} çiftinin düğün davetiyesi.`,
-  };
+  return shareMetadata(await getWedding());
 }
 
 /**

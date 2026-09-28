@@ -5,7 +5,21 @@ import { useRef, useState, useTransition } from "react";
 import { submitRsvp } from "@/actions/rsvp";
 import { cn } from "@/lib/utils/cn";
 import { MAX_NOTE_LENGTH } from "@/lib/validation/schemas";
-import type { GuestWithRsvp, Rsvp, RsvpStatus } from "@/types";
+import type { Rsvp, RsvpStatus } from "@/types";
+
+/**
+ * Formun ihtiyaç duyduğu alanlar.
+ *
+ * Davetli kaydının tamamı değil yalnızca bu üç alan geçilir: client
+ * component'e verilen her şey sayfa kaynağına serileşir. Davetli
+ * bağlantısını başkasına ilettiğinde telefon numarası ve grup bilgisi
+ * de gitmiş olmamalı (şartname §39).
+ */
+export interface RsvpFormGuest {
+  token: string;
+  invitationLimit: number;
+  rsvp: Rsvp | null;
+}
 
 type View =
   /** Henüz seçim yapılmadı: iki büyük buton. */
@@ -15,7 +29,7 @@ type View =
   /** Cevap kaydedildi. */
   | { kind: "saved"; rsvp: Rsvp; justSubmitted: boolean };
 
-export function RsvpForm({ guest }: { guest: GuestWithRsvp }) {
+export function RsvpForm({ guest }: { guest: RsvpFormGuest }) {
   const [view, setView] = useState<View>(() =>
     guest.rsvp
       ? { kind: "saved", rsvp: guest.rsvp, justSubmitted: false }

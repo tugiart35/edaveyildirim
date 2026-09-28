@@ -4,19 +4,17 @@ import { notFound } from "next/navigation";
 import { InvitationPage } from "@/components/invitation/invitation-page";
 import { RsvpSection } from "@/components/invitation/rsvp-section";
 import { getGuestByToken, getWedding } from "@/lib/data";
-import { coupleTitle } from "@/lib/utils/wedding";
+import { shareMetadata } from "@/lib/share-metadata";
 
 /**
  * Davetli adı ve token metadata'ya asla girmez (şartname §38) ve sayfa
  * arama motorlarına kapatılır — kişisel bağlantı indekslenmemelidir.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const wedding = await getWedding();
-  const couple = coupleTitle(wedding);
-
   return {
-    title: `${couple} | Düğün Davetiyesi`,
-    description: `${couple} çiftinin düğün davetiyesi.`,
+    ...shareMetadata(await getWedding()),
+    // Kişisel bağlantı arama motorlarına kapalıdır; bağlantı önizlemesi
+    // (WhatsApp vb.) bundan etkilenmez.
     robots: { index: false, follow: false },
   };
 }

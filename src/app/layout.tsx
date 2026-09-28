@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 
+import { siteUrl } from "@/lib/config";
 import { getWedding } from "@/lib/data";
 
 import "./globals.css";
@@ -19,6 +20,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  /**
+   * Bağlantı önizlemelerindeki göreli görsel yolları mutlak adrese
+   * çevrilir. WhatsApp ve benzeri istemciler göreli yolu çözemez.
+   */
+  metadataBase: new URL(siteUrl),
   title: "Düğün Davetiyesi",
   description: "Online düğün davetiyesi ve katılım bildirimi.",
 };

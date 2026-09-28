@@ -14,7 +14,13 @@ export function RsvpSection({ guest }: { guest: GuestWithRsvp }) {
         ederiz.
       </p>
 
-      <RsvpForm guest={guest} />
+      <RsvpForm
+        guest={{
+          token: guest.token,
+          invitationLimit: guest.invitationLimit,
+          rsvp: guest.rsvp,
+        }}
+      />
     </div>
   );
 }
