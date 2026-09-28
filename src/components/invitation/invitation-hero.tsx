@@ -61,8 +61,11 @@ function CoverArtwork({
       <Greeting name={guestName} />
 
       {/*
-        Çizim kendi oranını korur; yalnızca üst sınırlar verilir. Yükseklik
-        sınırlıdır ki alttaki tarih ve davet metni ekrandan taşmasın.
+        Çizim kendi oranını korur; yalnızca üst sınırlar verilir. Sınır
+        eskiden 54vh idi, çünkü altında tarih ve davet cümlesi vardı.
+        İkisi de kalkınca çizim tek başına kaldı; 68vh onu ekranın
+        ortasında küçük bir pul gibi bırakmıyor, selamlama ve kaydırma
+        ipucuna da yer kalıyor.
       */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -71,23 +74,15 @@ function CoverArtwork({
         // Kapak ilk görülen şey: geciktirilmeden yüklenmeli.
         fetchPriority="high"
         decoding="async"
-        className="h-auto w-auto max-h-[min(54vh,32rem)] max-w-full object-contain"
+        className="h-auto w-auto max-h-[min(68vh,40rem)] max-w-full object-contain"
       />
 
       {/*
-        Davet cümlesi burada gösterilmez. Çizim kapak davetin sözünü
-        kendi el yazısıyla söylüyor; altına dizilen matbu bir cümle
-        aynı şeyi ikinci kez, başka bir sesle tekrar ediyordu. Yalnızca
-        tarih kalır. (Cümle yazılı kapakta hâlâ görünür.)
+        Çizimin altında yazı yoktur. Davet cümlesi de tarih de çizimin
+        kendi içinde, kendi el yazısıyla duruyor; altlarına dizilen
+        matbu kopyaları aynı şeyi ikinci kez, başka bir sesle
+        söylüyordu. (İkisi de yazılı kapakta görünmeye devam eder.)
       */}
-      <div className="flex flex-col items-center text-center">
-        <Hairline className="w-10" />
-
-        <p className="mt-6 text-xs tracking-(--label-tracking) text-graphite sm:text-sm">
-          {trUpper(formatLongDate(wedding.eventDate))}
-        </p>
-      </div>
-
       <ScrollHint tone="light" />
     </section>
   );
