@@ -38,9 +38,15 @@ export function ArtworkPanel({
           Geri sayım çizimin üstüne biner ve kalem rengiyle yazılır;
           böylece ayrı bir arayüz parçası gibi değil, çizimin bir
           parçası gibi okunur.
+
+          Dikeyde tam ortada değil %34'te durur. Değer ölçüldü: çizimin
+          satır satır koyuluğu çıkarıldığında başlık %5.8–%9.2, saat
+          çizimi %59–%95 aralığını kaplıyor; aradaki boşluğun ortası
+          %34.1. Tam orta (%50) sayıları saatin tepesine yapıştırıp
+          üstte kocaman bir boşluk bırakıyordu.
         */}
         {panel.countdown ? (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-ink">
+          <div className="pointer-events-none absolute inset-x-0 top-[34%] flex -translate-y-1/2 justify-center text-ink">
             <Countdown targetMs={weddingStartMs} />
           </div>
         ) : null}
