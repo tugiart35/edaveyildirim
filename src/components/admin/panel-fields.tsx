@@ -104,6 +104,19 @@ export function PanelFields({
                   />
                   Çizimin altında düğüne kalan süreyi göster
                 </label>
+
+                <label className="flex items-center gap-2 text-xs text-graphite">
+                  <input
+                    type="checkbox"
+                    checked={panel.directions === true}
+                    onChange={(event) =>
+                      update(index, { directions: event.target.checked })
+                    }
+                    disabled={disabled}
+                    className="accent-charcoal"
+                  />
+                  Kart başlığında &ldquo;Yol Tarifi&rdquo; bağlantısı göster
+                </label>
               </div>
 
               <Preview src={panel.image} label={panel.label} />
@@ -141,7 +154,10 @@ export function PanelFields({
         type="button"
         disabled={disabled || full}
         onClick={() =>
-          onChange([...panels, { label: "", image: "", countdown: false }])
+          onChange([
+            ...panels,
+            { label: "", image: "", countdown: false, directions: false },
+          ])
         }
         className="w-fit rounded-(--button-radius) border border-beige px-4 py-2 text-xs text-graphite transition-colors duration-200 hover:border-charcoal/30 hover:text-charcoal disabled:cursor-not-allowed disabled:opacity-50"
       >

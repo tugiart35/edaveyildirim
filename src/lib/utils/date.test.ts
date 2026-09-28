@@ -22,6 +22,7 @@ const wedding: Wedding = {
   invitationText: null,
   theme: "elegant",
   coverImage: null,
+  rsvpImage: null,
   primaryImage: null,
   galleryImages: [],
   panels: [],

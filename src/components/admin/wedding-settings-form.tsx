@@ -11,6 +11,7 @@ export function WeddingSettingsForm({ wedding }: { wedding: Wedding }) {
   const [theme, setTheme] = useState<Theme>(wedding.theme);
   const [nameOrder, setNameOrder] = useState<NameOrder>(wedding.nameOrder);
   const [coverImage, setCoverImage] = useState(wedding.coverImage ?? "");
+  const [rsvpImage, setRsvpImage] = useState(wedding.rsvpImage ?? "");
   const [primaryImage, setPrimaryImage] = useState(wedding.primaryImage ?? "");
   const [gallery, setGallery] = useState<string[]>(wedding.galleryImages);
   const [panels, setPanels] = useState<InvitationPanel[]>(wedding.panels);
@@ -41,6 +42,7 @@ export function WeddingSettingsForm({ wedding }: { wedding: Wedding }) {
       invitationText: text("invitationText") || null,
       theme,
       coverImage: coverImage.trim() || null,
+      rsvpImage: rsvpImage.trim() || null,
       primaryImage: primaryImage.trim() || null,
       galleryImages: gallery.filter((src) => src.trim() !== ""),
       panels: panels.filter(
@@ -225,6 +227,15 @@ export function WeddingSettingsForm({ wedding }: { wedding: Wedding }) {
           value={coverImage}
           disabled={isPending}
           onChange={setCoverImage}
+        />
+
+        <ImageField
+          id="rsvpImage"
+          label="Katılım çizimi"
+          hint="Katılım kartının başında, cevap butonlarının hemen üstünde görünür. Boş bırakılırsa yazılı başlık kullanılır."
+          value={rsvpImage}
+          disabled={isPending}
+          onChange={setRsvpImage}
         />
 
         <ImageField

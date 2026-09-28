@@ -29,6 +29,7 @@ export const weddingInputSchema = z.object({
   invitationText: z.string().trim().max(600).nullable(),
   theme: z.enum(THEMES as unknown as [string, ...string[]]),
   coverImage: z.string().nullable(),
+  rsvpImage: z.string().nullable(),
   primaryImage: z.string().nullable(),
   galleryImages: z.array(z.string()).max(MAX_GALLERY_IMAGES),
   panels: z
@@ -37,6 +38,7 @@ export const weddingInputSchema = z.object({
         label: z.string().trim().min(1, "Panel etiketi gerekli.").max(40),
         image: z.string().trim().min(1, "Panel görseli gerekli."),
         countdown: z.boolean().optional(),
+        directions: z.boolean().optional(),
       }),
     )
     .max(MAX_PANELS),

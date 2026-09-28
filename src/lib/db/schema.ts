@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS weddings (
   invitation_text    TEXT,
   theme              TEXT    NOT NULL DEFAULT 'elegant',
   cover_image        TEXT,
+  rsvp_image         TEXT,
   primary_image      TEXT,
   gallery_images     TEXT    NOT NULL DEFAULT '[]',
   panels             TEXT    NOT NULL DEFAULT '[]',

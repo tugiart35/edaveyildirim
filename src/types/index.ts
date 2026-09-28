@@ -37,6 +37,8 @@ export interface InvitationPanel {
   image: string;
   /** Açıksa çizimin altında düğüne kalan süre gösterilir. */
   countdown?: boolean;
+  /** Açıksa kart başlığına "Yol Tarifi" bağlantısı konur. */
+  directions?: boolean;
 }
 
 export interface Wedding {
@@ -64,6 +66,14 @@ export interface Wedding {
    * içeriyorsa tipografi tekrar edilmez.
    */
   coverImage: string | null;
+  /**
+   * Katılım kartının başındaki çizim.
+   *
+   * Soruyu çizim sorar, hemen altında cevap butonları gelir. Ayrı bir
+   * panel olsaydı soru ile cevap farklı kartlara düşer ve davetli
+   * soruyu okuduktan sonra cevap vermek için kaydırmak zorunda kalırdı.
+   */
+  rsvpImage: string | null;
   primaryImage: string | null;
   galleryImages: string[];
   /** Sırasıyla gösterilen çizim kartları. */

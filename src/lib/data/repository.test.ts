@@ -287,9 +287,17 @@ describe("düğün bilgileri", () => {
       invitationText: "Bizimle olun.",
       theme: "romantic",
       coverImage: "/design/kapak.jpg",
+      rsvpImage: "/design/katilim.jpg",
       primaryImage: "/mock/hero.jpg",
       galleryImages: ["/a.jpg", "/b.jpg"],
-      panels: [{ label: "Düğün", image: "/design/dugun.jpg", countdown: true }],
+      panels: [
+        {
+          label: "Düğün",
+          image: "/design/dugun.jpg",
+          countdown: true,
+          directions: true,
+        },
+      ],
       musicUrl: null,
       enableChildSplit: false,
     });
@@ -299,8 +307,14 @@ describe("düğün bilgileri", () => {
     expect(updated.nameOrder).toBe("groom_first");
     expect(updated.theme).toBe("romantic");
     expect(updated.coverImage).toBe("/design/kapak.jpg");
+    expect(updated.rsvpImage).toBe("/design/katilim.jpg");
     expect(updated.panels).toEqual([
-      { label: "Düğün", image: "/design/dugun.jpg", countdown: true },
+      {
+        label: "Düğün",
+        image: "/design/dugun.jpg",
+        countdown: true,
+        directions: true,
+      },
     ]);
     expect(updated.galleryImages).toEqual(["/a.jpg", "/b.jpg"]);
     expect(updated.enableChildSplit).toBe(false);
@@ -322,6 +336,7 @@ describe("düğün bilgileri", () => {
       invitationText: null,
       theme: current.theme,
       coverImage: null,
+      rsvpImage: null,
       primaryImage: null,
       galleryImages: [],
       panels: [],
@@ -341,6 +356,7 @@ describe("düğün bilgileri", () => {
 
     expect(columns.map((column) => column.name)).toContain("cover_image");
     expect(columns.map((column) => column.name)).toContain("panels");
+    expect(columns.map((column) => column.name)).toContain("rsvp_image");
   });
 
   it("panel sayısı sekizi aşamaz", () => {

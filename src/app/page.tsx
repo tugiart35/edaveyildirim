@@ -32,9 +32,20 @@ export default async function HomePage() {
       wedding={wedding}
       rsvpCard={
         <div className="flex flex-col items-center text-center">
-          <h3 className="type-display text-3xl text-charcoal sm:text-4xl">
-            Aramızda olacak mısınız?
-          </h3>
+          {wedding.rsvpImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={wedding.rsvpImage}
+              alt="Aramızda olacak mısınız?"
+              loading="lazy"
+              decoding="async"
+              className="h-auto w-auto max-h-[min(34vh,18rem)] max-w-full object-contain"
+            />
+          ) : (
+            <h3 className="type-display text-3xl text-charcoal sm:text-4xl">
+              Aramızda olacak mısınız?
+            </h3>
+          )}
           <p className="mt-8 max-w-sm text-balance text-sm leading-loose text-graphite">
             Katılım durumunuzu bildirmek için size gönderilen kişisel davet
             bağlantısını kullanabilirsiniz.

@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { Countdown } from "@/components/invitation/countdown";
 import type { InvitationPanel } from "@/types";
 
@@ -9,9 +7,15 @@ import type { InvitationPanel } from "@/types";
  * Çizimler tarih, saat, mekân gibi bilgileri kendi içlerinde taşır;
  * bu yüzden yanına metin eklenmez — çizim tek başına konuşur.
  *
- * Yükseklik viewport'a göre sınırlanır: dikey bir çizim tam genişlikte
- * gösterilseydi kart bir ekranı aşar ve yığılma akışı okunmaz hale
- * gelirdi. Görsel asla kırpılmaz.
+ * Görsel **kendi en–boy oranını korur**. `next/image`'ın `fill` kipi
+ * sabit boyutlu bir kap ister; oranı farklı bir çizim (örneğin yatay
+ * bir metin çizimi dikey bir kutuda) o kalıba sokulunca küçülüp
+ * okunamaz hale geliyordu. Düz `<img>` tarayıcının doğal
+ * boyutlandırmasını kullanır: yalnızca üst sınırlar verilir, oran
+ * çizimin kendisinden gelir.
+ *
+ * Yükseklik sınırı önemlidir: kart bir ekranı aşarsa yığılma akışı
+ * okunmaz hale gelir.
  */
 export function ArtworkPanel({
   panel,
@@ -21,21 +25,20 @@ export function ArtworkPanel({
   weddingStartMs: number;
 }) {
   // Geri sayım varken çizime daha az yer kalmalı ki kart bir ekranı aşmasın.
-  const artworkHeight = panel.countdown
-    ? "h-[min(50vh,30rem)]"
-    : "h-[min(62vh,38rem)]";
+  const maxHeight = panel.countdown
+    ? "max-h-[min(46vh,28rem)]"
+    : "max-h-[min(60vh,36rem)]";
 
   return (
     <div className="flex flex-col items-center gap-7">
-      <div className={`relative w-full max-w-md ${artworkHeight}`}>
-        <Image
-          src={panel.image}
-          alt={panel.label}
-          fill
-          sizes="(min-width: 640px) 28rem, 100vw"
-          className="object-contain"
-        />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={panel.image}
+        alt={panel.label}
+        loading="lazy"
+        decoding="async"
+        className={`h-auto w-auto max-w-full object-contain ${maxHeight}`}
+      />
 
       {panel.countdown ? <Countdown targetMs={weddingStartMs} /> : null}
     </div>

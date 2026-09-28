@@ -32,7 +32,7 @@ export default async function InvitePage(props: PageProps<"/invite/[token]">) {
     <InvitationPage
       wedding={wedding}
       guestName={guest.name}
-      rsvpCard={<RsvpSection guest={guest} />}
+      rsvpCard={<RsvpSection guest={guest} wedding={wedding} />}
     />
   );
 }

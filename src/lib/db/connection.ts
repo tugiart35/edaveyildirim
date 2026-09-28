@@ -104,6 +104,7 @@ export function openDatabase(file: string): DatabaseSync {
  */
 function applyMigrations(db: DatabaseSync): void {
   addColumn(db, "weddings", "cover_image", "TEXT");
+  addColumn(db, "weddings", "rsvp_image", "TEXT");
   addColumn(db, "weddings", "panels", "TEXT NOT NULL DEFAULT '[]'");
 }
 

@@ -70,7 +70,7 @@ export function createRepository(db: DatabaseSync) {
          event_date = ?, event_time = ?, timezone = ?,
          venue_name = ?, venue_address = ?, maps_url = ?,
          invitation_text = ?, theme = ?,
-         cover_image = ?, primary_image = ?, gallery_images = ?, panels = ?,
+         cover_image = ?, rsvp_image = ?, primary_image = ?, gallery_images = ?, panels = ?,
          music_url = ?,
          enable_child_split = ?, updated_at = ?
        WHERE id = ?`,
@@ -87,6 +87,7 @@ export function createRepository(db: DatabaseSync) {
       input.invitationText,
       input.theme,
       input.coverImage,
+      input.rsvpImage,
       input.primaryImage,
       JSON.stringify(input.galleryImages),
       JSON.stringify(input.panels),
@@ -285,6 +286,7 @@ interface WeddingRow {
   invitation_text: string | null;
   theme: string;
   cover_image: string | null;
+  rsvp_image: string | null;
   primary_image: string | null;
   gallery_images: string;
   panels: string;
@@ -344,6 +346,7 @@ function toWedding(row: WeddingRow): Wedding {
     invitationText: row.invitation_text,
     theme: row.theme as Theme,
     coverImage: row.cover_image,
+    rsvpImage: row.rsvp_image,
     primaryImage: row.primary_image,
     galleryImages: parseGallery(row.gallery_images),
     panels: parsePanels(row.panels),
@@ -419,6 +422,7 @@ function parsePanels(value: string): InvitationPanel[] {
         label: panel.label,
         image: panel.image,
         countdown: panel.countdown === true,
+        directions: panel.directions === true,
       }));
   } catch {
     return [];

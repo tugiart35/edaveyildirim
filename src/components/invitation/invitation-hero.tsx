@@ -61,19 +61,18 @@ function CoverArtwork({
       <Greeting name={guestName} />
 
       {/*
-        Çizim asla kırpılmaz. Yükseklik viewport'a göre sınırlanır ki
-        alttaki tarih ve davet metni ekrandan taşmasın.
+        Çizim kendi oranını korur; yalnızca üst sınırlar verilir. Yükseklik
+        sınırlıdır ki alttaki tarih ve davet metni ekrandan taşmasın.
       */}
-      <div className="relative h-[min(52vh,30rem)] w-full max-w-xs sm:max-w-sm">
-        <Image
-          src={source}
-          alt={`${coupleTitle(wedding)} düğün davetiyesi`}
-          fill
-          priority
-          sizes="(min-width: 640px) 24rem, 20rem"
-          className="object-contain"
-        />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={source}
+        alt={`${coupleTitle(wedding)} düğün davetiyesi`}
+        // Kapak ilk görülen şey: geciktirilmeden yüklenmeli.
+        fetchPriority="high"
+        decoding="async"
+        className="h-auto w-auto max-h-[min(54vh,32rem)] max-w-full object-contain"
+      />
 
       <div className="flex flex-col items-center text-center">
         <Hairline className="w-10" />
