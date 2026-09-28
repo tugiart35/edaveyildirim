@@ -1,35 +1,24 @@
 import "server-only";
 
-import { jsonRepository } from "@/lib/data/json-repository";
-import { isSupabaseConfigured } from "@/lib/data/supabase-client";
-import { supabaseRepository } from "@/lib/data/supabase-repository";
-import type { WeddingStore } from "@/lib/data/store";
+import { createRepository } from "@/lib/data/repository";
+import { getDatabase } from "@/lib/db/connection";
 
 /**
  * Uygulamanın tek veri erişim noktası.
  *
- * Supabase yapılandırılmışsa Postgres, değilse geliştirme için JSON
- * dosyası kullanılır. Arayüz kodu bu ayrımı görmez — iki implementasyon
- * da `WeddingStore` arayüzünü uygular.
- *
- * Böylece proje veritabanı olmadan da çalışır; anahtarlar `.env.local`
- * dosyasına eklendiği anda Postgres devreye girer.
+ * Arayüz kodu yalnızca bu modülü tanır; altındaki SQLite'ı görmez.
+ * Bağlantı ilk kullanımda açılır, süreç boyunca açık kalır.
  */
-const store: WeddingStore = isSupabaseConfigured()
-  ? supabaseRepository
-  : jsonRepository;
+const repository = createRepository(getDatabase());
 
-/** Hangi deponun etkin olduğunu gösterir (kurulum ekranları için). */
-export const activeStore = isSupabaseConfigured() ? "supabase" : "json";
+export const getWedding = repository.getWedding;
+export const updateWedding = repository.updateWedding;
 
-export const getWedding = store.getWedding;
-export const updateWedding = store.updateWedding;
+export const listGuests = repository.listGuests;
+export const getGuestByToken = repository.getGuestByToken;
+export const getGuestById = repository.getGuestById;
+export const createGuest = repository.createGuest;
+export const updateGuest = repository.updateGuest;
+export const deleteGuest = repository.deleteGuest;
 
-export const listGuests = store.listGuests;
-export const getGuestByToken = store.getGuestByToken;
-export const getGuestById = store.getGuestById;
-export const createGuest = store.createGuest;
-export const updateGuest = store.updateGuest;
-export const deleteGuest = store.deleteGuest;
-
-export const saveRsvp = store.saveRsvp;
+export const saveRsvp = repository.saveRsvp;

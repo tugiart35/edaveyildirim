@@ -9,12 +9,11 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "reset-data": "rm -rf .data && echo 'Veri deposu sifirlandi; sonraki istekte ornek veri yeniden olusturulacak.'",
+    "reset-data": "rm -rf .data && echo 'Veritabani silindi. npm run seed ile yeniden olusturun.'",
     "hash-password": "node scripts/hash-password.mjs",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node --experimental-strip-types scripts/seed.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.117.2",
     "clsx": "^2.1.1",
     "nanoid": "^6.0.1",
     "next": "16.3.6",

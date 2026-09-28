@@ -4,6 +4,16 @@ import { InvitationPage } from "@/components/invitation/invitation-page";
 import { getWedding } from "@/lib/data";
 import { coupleTitle } from "@/lib/utils/wedding";
 
+/**
+ * Davetiye her istekte veritabanından üretilir.
+ *
+ * Statik üretim burada yanlış olurdu: sayfa derleme anındaki veriyle
+ * dondurulur ve sunucuda bambaşka bir veritabanı olsa bile o eski
+ * içeriği servis eder. SQLite okuması mikrosaniyeler sürdüğü için
+ * dinamik üretmenin görünür bir maliyeti yok.
+ */
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const wedding = await getWedding();
   const couple = coupleTitle(wedding);

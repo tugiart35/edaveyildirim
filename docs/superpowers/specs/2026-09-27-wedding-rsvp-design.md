@@ -41,15 +41,15 @@ Public davetiye sayfası, kişiye özel token'lı davetiye, RSVP alma ve güncel
 | Stil | Tailwind CSS v4 | — |
 | Admin UI | Elle yazılmış bileşenler + yerel `<dialog>` | Aşağıdaki nota bakın |
 | Public UI | Tamamen özel bileşenler | Şartname §45: generic SaaS görünümü olmamalı |
-| Veritabanı | Supabase Postgres | Şartname §6 |
-| Dosya | Supabase Storage, bucket `wedding-assets` | Şartname §37 |
+| Veritabanı | SQLite (`node:sqlite`) | Tek düğün için ayrı servis gereksiz; bkz. sapma #11 |
+| Dosya | Şimdilik yok (yol elle girilir) | bkz. sapma #10 |
 | Auth | Özel: `node:crypto` scrypt + HMAC imzalı cookie | Tek admin için Supabase Auth'tan daha az parça; ek bağımlılık yok |
 | Validasyon | Zod (paylaşılan şemalar) | Şartname §41 |
 | Mutasyon | Server Actions + `revalidatePath` | Şartname §54, §58 |
 | Animasyon | CSS + IntersectionObserver hook | Framer Motion'dan hafif; şartname §44 opsiyonel diyor |
 | Test | Vitest | Şartname §60 |
 | Font | `next/font` — Cormorant Garamond + Inter | Şartname §46, en fazla iki aile |
-| Deploy | Vercel + Supabase | Şartname §63 |
+| Deploy | Docker / Dokploy, kalıcı disk | Kullanıcının kendi VPS'i |
 
 **State yönetimi:** React yerel state + Server Actions. Redux / React Query yok.
 
@@ -61,21 +61,20 @@ Public davetiye sayfası, kişiye özel token'lı davetiye, RSVP alma ve güncel
 
 ## 3. Güvenlik mimarisi
 
-Bu, şartname §39-40'ın uygulanış biçimidir ve projedeki en önemli yapısal karardır.
+Bu, şartname §39-40'ın uygulanış biçimidir.
 
-**Supabase'e yalnızca sunucu tarafından erişilir.** Service role key ile oluşturulan client, sadece Server Component ve Server Action içinde kullanılır. Tarayıcıya hiçbir Supabase SDK veya anahtar gönderilmez.
+**Veritabanına yalnızca sunucudan erişilir.** SQLite dosyası sunucunun diskindedir; tarayıcıya hiçbir veritabanı istemcisi veya kimlik bilgisi gitmez. `src/lib/db/connection.ts` ve `src/lib/data/index.ts` `server-only` ile işaretlidir: bir client component'e sızarlarsa derleme hata verir.
 
-**RLS tüm tablolarda açık, `anon` ve `authenticated` rolleri için hiçbir policy tanımlı değil.** Policy yokluğu = erişim reddi. Service role RLS'i baypas ettiği için sunucu çalışır, tarayıcı çalışmaz. Anahtar bir şekilde sızsa bile veri okunamaz.
-
-**Sonuç:** `NEXT_PUBLIC_SUPABASE_ANON_KEY` env değişkenine ihtiyaç yok. Şartname §51'deki liste bu yüzden farklılaşıyor.
+Supabase kullanılmadığı için RLS'e gerek yoktur — ağ üzerinden erişilebilen bir veritabanı yoktur.
 
 **Diğer kurallar:**
 
-- `/invite/[token]` yalnızca o token'a ait guest kaydını döner; başka davetli verisi sızmaz.
-- Guest listesi hiçbir public endpoint'ten erişilebilir değil.
+- `/invite/[token]` yalnızca o token'a ait davetli bilgisini döner; başka davetli verisi sızmaz.
+- Davetli listesi hiçbir public endpoint'ten erişilebilir değil.
 - `/admin/*` `src/proxy.ts` ile korunur (Next.js 16'da `middleware` bu isme taşındı).
-- Token ve guest adı SEO metadata'sında yer almaz (şartname §38).
-- Secret'lar yalnızca `.env.local` içinde; repoya `.env.example` girer.
+- Token ve davetli adı SEO metadata'sında yer almaz; kişisel sayfalar `noindex` (şartname §38).
+- Secret'lar yalnızca `.env.local` içinde; repoya boş `.env.example` girer.
+- Veritabanı derleme çıktısına dahil edilmez (`outputFileTracingExcludes`) ve Docker bağlamına girmez (`.dockerignore`).
 
 ---
 
@@ -577,11 +576,12 @@ Build veya lint hatalıyken proje tamamlanmış sayılmaz.
 |---|---|---|---|
 | 1 | §21: `rsvps.status` `pending` içerir | `pending` satır olarak saklanmaz, türetilir | UNIQUE constraint ile upsert doğallaşır; hesaplar birebir aynı |
 | 2 | §6, §22: Supabase Auth | Özel `node:crypto` scrypt + HMAC cookie | Tek admin için daha az parça, ek bağımlılık yok; ileride Supabase Auth'a geçiş kolay |
-| 3 | §51: `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yok | Tarayıcı Supabase'e hiç bağlanmıyor; anahtarı hiç yayınlamamak daha güvenli |
+| 3 | §51: Supabase env değişkenleri | `DATABASE_FILE` | Supabase kullanılmıyor |
 | 4 | §44: Framer Motion önerisi | CSS + kaydırmaya bağlı `--enter` ilerlemesi | Daha küçük bundle; mobil 4G hedefi (§59) |
 | 5 | §16: yetişkin/çocuk ayrımı | Şema alanları var, UI yok | Kapsam kararı |
 | 6 | §35: CSV import | Yok | Kapsam kararı |
 | 7 | §49: setup wizard | Yok | Settings sayfası aynı işlevi görüyor |
 | 8 | §3, §70: kod öncesi içerik formu | Placeholder içerikle başlanır | İçerik admin panelinden düzenlenebilir; geliştirme beklemez |
 | 9 | §6: shadcn/ui "mümkünse" | Elle yazılmış bileşenler + yerel `<dialog>` | Kendi jeton sistemimizle çakışırdı; tek karmaşık parça modal ve o tarayıcıdan geliyor |
-| 10 | §37: görseller Storage'dan | Frontend fazında dosya yolu elle yazılır | Yükleme Adım 11'de; form alanları aynı kalıp yanına buton alacak |
+| 10 | §37: görseller Storage'dan | Dosya yolu elle yazılır | Yükleme sonraki turda; form alanları aynı kalıp yanına buton alacak |
+| 11 | §6, §63: Supabase + Vercel | SQLite + kendi VPS (Dokploy) | Tek seferlik bir düğün için ayrı bir veritabanı servisi ve hesap gereksiz. Tüm veri tek dosyada; yedek almak dosyayı kopyalamak. Kısıt: uygulama tek container'da çalışmalı. |

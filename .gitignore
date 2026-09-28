@@ -43,3 +43,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# SQLite yan dosyaları (veritabanı zaten /.data/ içinde, o da yok sayılıyor)
+*.db-wal
+*.db-shm

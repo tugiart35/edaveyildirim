@@ -24,6 +24,17 @@ export const metadata: Metadata = {
 };
 
 /**
+ * Uygulamanın tamamı her istekte üretilir.
+ *
+ * Her sayfa veritabanından okur. Statik üretim iki soruna yol açıyordu:
+ * sayfalar derleme anındaki veriyle donuyordu ve derleme sırasında açılan
+ * veritabanı bağlantısı, geliştirme veritabanının derleme çıktısına
+ * kopyalanmasına neden oluyordu. Yerel SQLite okuması mikrosaniyeler
+ * sürdüğü için dinamik üretmenin görünür bir maliyeti yok.
+ */
+export const dynamic = "force-dynamic";
+
+/**
  * Tema kök öğeye yazılır: sayfa arka planı `body` üzerinde olduğu için
  * tema değişkenlerinin `body`'yi de kapsaması gerekir.
  *
