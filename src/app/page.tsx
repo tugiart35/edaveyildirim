@@ -46,10 +46,6 @@ export default async function HomePage() {
               Aramızda olacak mısınız?
             </h3>
           )}
-          <p className="mt-8 max-w-sm text-balance text-sm leading-loose text-graphite">
-            Katılım durumunuzu bildirmek için size gönderilen kişisel davet
-            bağlantısını kullanabilirsiniz.
-          </p>
         </div>
       }
     />

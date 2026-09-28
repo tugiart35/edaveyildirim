@@ -13,8 +13,9 @@ const UNITS: Array<{ key: keyof CountdownParts; label: string }> = [
 /**
  * Düğüne kalan süre.
  *
- * Bir çizim panelinin altında gösterilir; kendi başlığı ve kabuğu yoktur,
- * onları panel sağlar.
+ * Bir çizim panelinin üstünde ya da altında gösterilir; kendi başlığı ve
+ * kabuğu yoktur, onları panel sağlar. Rengi `currentColor`'dan alır —
+ * çizim üstünde kalem rengiyle, tek başınayken metin rengiyle çizilir.
  *
  * Sayılar yalnızca tarayıcıda hesaplanır: sayfa her istekte üretilse de
  * sunucu ile ziyaretçinin saati farklı olabilir ve hidrasyon uyuşmazlığı
@@ -47,13 +48,13 @@ export function Countdown({ targetMs }: { targetMs: number }) {
       {UNITS.map((unit) => (
         <div key={unit.key} className="flex flex-col items-center">
           <span
-            className="type-display text-4xl leading-none tabular-nums text-charcoal sm:text-5xl"
+            className="type-display text-4xl leading-none tabular-nums text-current sm:text-5xl"
             // Sayılar gelene kadar yer tutucu görünmez durur.
             style={parts === null ? { visibility: "hidden" } : undefined}
           >
             {parts === null ? "00" : String(parts[unit.key]).padStart(2, "0")}
           </span>
-          <span className="mt-3 text-[0.6rem] tracking-[0.3em] text-stone">
+          <span className="mt-3 text-[0.6rem] tracking-[0.3em] text-current opacity-70">
             {unit.label}
           </span>
         </div>

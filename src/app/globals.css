@@ -16,6 +16,10 @@
   /* Çizimlerin kağıt rengi. Kapak görselinin kenarları belli olmasın
      diye hero zemini birebir bu değerdir. */
   --color-paper: #fefdf9;
+  /* Çizimlerin kalem rengi. Çizim üstüne binen metinler (geri sayım)
+     bu renkte yazılır ki çizimin parçasıymış gibi dursun. Değer
+     "GERİ SAYIM" el yazısından örneklendi. */
+  --color-ink: #4a6241;
   --color-sand: #ece5d8;
   --color-beige: #ddd3c2;
 
