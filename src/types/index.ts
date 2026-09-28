@@ -35,7 +35,10 @@ export interface InvitationPanel {
   label: string;
   /** Çizim yolu. */
   image: string;
-  /** Açıksa çizimin altında düğüne kalan süre gösterilir. */
+  /**
+   * Açıksa düğüne kalan süre çizimin üstüne yazılır ve katılım kartı
+   * bu panelin hemen önüne yerleşir (bkz. `InvitationPage`).
+   */
   countdown?: boolean;
   /** Açıksa kart başlığına "Yol Tarifi" bağlantısı konur. */
   directions?: boolean;

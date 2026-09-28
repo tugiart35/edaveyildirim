@@ -102,8 +102,12 @@ export function PanelFields({
                     disabled={disabled}
                     className="accent-charcoal"
                   />
-                  Çizimin altında düğüne kalan süreyi göster
+                  Düğüne kalan süreyi çizimin üstüne yaz
                 </label>
+                <p className="-mt-1 pl-6 text-xs text-stone">
+                  Katılım kartı bu panelin hemen önüne yerleşir; geri
+                  sayım davetiyeyi kapatan kart olur.
+                </p>
 
                 <label className="flex items-center gap-2 text-xs text-graphite">
                   <input

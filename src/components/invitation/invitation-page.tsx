@@ -66,7 +66,21 @@ export function InvitationPage({
     });
   }
 
-  cards.push({
+  /*
+    Katılım kartı, geri sayım panelinin **önüne** girer.
+
+    Geri sayım davetiyeyi kapatan karttır: cevap verildikten sonra
+    geriye kalan tek şey beklemektir. Katılım sona konduğunda davetiye
+    bir formla bitiyordu.
+
+    Geri sayım paneli yoksa katılım en sonda kalır — kural tek yerde
+    ve öngörülebilir: "katılım, geri sayımdan hemen önce".
+  */
+  // Panel kartları diziye sırayla ilk eklendiği için panel indeksi
+  // kart indeksiyle birebir aynıdır.
+  const countdownIndex = wedding.panels.findIndex((panel) => panel.countdown);
+
+  cards.splice(countdownIndex === -1 ? cards.length : countdownIndex, 0, {
     id: "katilim",
     label: "Katılım",
     content: rsvpCard,
