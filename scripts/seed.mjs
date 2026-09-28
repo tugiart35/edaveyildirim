@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
@@ -14,9 +14,8 @@ import { SCHEMA_SQL } from "../src/lib/db/schema.ts";
  *
  *     npm run seed
  *
- * Mevcut veriyi asla ezmez: tablolar doluysa dokunmaz. Eski JSON
- * deposu (.data/dev-store.json) duruyorsa içeriğini SQLite'a taşır,
- * yoksa örnek veriyle başlar.
+ * Mevcut veriyi asla ezmez: tablolar doluysa dokunmaz, boşsa örnek
+ * veriyle başlar.
  *
  * Production'da otomatik çalışmaz (şartname §50); elle çağrılır.
  */
@@ -41,23 +40,6 @@ const nanoid = customAlphabet(
 );
 
 const now = () => new Date().toISOString();
-
-/* -------------------------------------------------------------------------- */
-/*                         Eski JSON deposunu devral                          */
-/* -------------------------------------------------------------------------- */
-
-const legacyFile = path.join(process.cwd(), ".data", "dev-store.json");
-
-/** @returns {{wedding: any, guests: any[], rsvps: any[]} | null} */
-function readLegacy() {
-  if (!existsSync(legacyFile)) return null;
-  try {
-    return JSON.parse(readFileSync(legacyFile, "utf8"));
-  } catch {
-    console.warn("• Eski JSON deposu okunamadı, örnek veriyle devam ediliyor.");
-    return null;
-  }
-}
 
 /* -------------------------------------------------------------------------- */
 /*                                Örnek veri                                  */
@@ -99,8 +81,6 @@ const demoGuests = [
 /*                                   Düğün                                    */
 /* -------------------------------------------------------------------------- */
 
-const legacy = readLegacy();
-
 const weddingCount = db.prepare("SELECT COUNT(*) AS n FROM weddings").get().n;
 let weddingId;
 
@@ -110,25 +90,7 @@ if (weddingCount > 0) {
     .get().id;
   console.log("• Düğün kaydı zaten var, dokunulmadı.");
 } else {
-  const source = legacy?.wedding
-    ? {
-        bride_name: legacy.wedding.brideName,
-        groom_name: legacy.wedding.groomName,
-        name_order: legacy.wedding.nameOrder,
-        event_date: legacy.wedding.eventDate,
-        event_time: legacy.wedding.eventTime,
-        timezone: legacy.wedding.timezone,
-        venue_name: legacy.wedding.venueName,
-        venue_address: legacy.wedding.venueAddress,
-        maps_url: legacy.wedding.mapsUrl,
-        invitation_text: legacy.wedding.invitationText,
-        theme: legacy.wedding.theme,
-        primary_image: legacy.wedding.primaryImage,
-        gallery_images: JSON.stringify(legacy.wedding.galleryImages ?? []),
-        music_url: legacy.wedding.musicUrl,
-        enable_child_split: legacy.wedding.enableChildSplit ? 1 : 0,
-      }
-    : demoWedding;
+  const source = demoWedding;
 
   weddingId = randomUUID();
   const timestamp = now();
@@ -161,11 +123,7 @@ if (weddingCount > 0) {
     timestamp,
   );
 
-  console.log(
-    legacy?.wedding
-      ? `✓ Düğün kaydı eski JSON deposundan taşındı: ${source.bride_name} & ${source.groom_name}`
-      : "✓ Örnek düğün kaydı oluşturuldu.",
-  );
+  console.log("✓ Örnek düğün kaydı oluşturuldu.");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -192,20 +150,7 @@ const insertRsvp = db.prepare(
    VALUES (?,?,?,?,?,?,?)`,
 );
 
-// Eski depodaki davetliler token'larıyla birlikte taşınır: paylaşılmış
-// davet bağlantıları çalışmaya devam etmeli.
-const rows = legacy?.guests?.length
-  ? legacy.guests.map((guest) => ({
-      name: guest.name,
-      phone: guest.phone,
-      group_name: guest.groupName,
-      invitation_limit: guest.invitationLimit,
-      token: guest.token,
-      created_at: guest.createdAt,
-      updated_at: guest.updatedAt,
-      rsvp: legacy.rsvps?.find((r) => r.guestId === guest.id) ?? null,
-    }))
-  : demoGuests.map((guest) => ({ ...guest, token: nanoid() }));
+const rows = demoGuests.map((guest) => ({ ...guest, token: nanoid() }));
 
 for (const row of rows) {
   const id = randomUUID();
@@ -242,8 +187,4 @@ for (const row of rows) {
   }
 }
 
-console.log(
-  legacy?.guests?.length
-    ? "\nDavetliler eski JSON deposundan taşındı, davet bağlantıları korundu."
-    : "\nTamam.",
-);
+console.log("\nTamam.");
