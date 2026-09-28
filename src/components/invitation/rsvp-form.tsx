@@ -29,7 +29,14 @@ type View =
   /** Cevap kaydedildi. */
   | { kind: "saved"; rsvp: Rsvp; justSubmitted: boolean };
 
-export function RsvpForm({ guest }: { guest: RsvpFormGuest }) {
+export function RsvpForm({
+  guest,
+  image,
+}: {
+  guest: RsvpFormGuest;
+  /** Soruyu soran çizim; yoksa başlığı çağıran taraf yazar. */
+  image?: string | null;
+}) {
   const [view, setView] = useState<View>(() =>
     guest.rsvp
       ? { kind: "saved", rsvp: guest.rsvp, justSubmitted: false }
@@ -76,36 +83,49 @@ export function RsvpForm({ guest }: { guest: RsvpFormGuest }) {
     });
   }
 
+  /*
+    Çizim her adımda başta durur ama ayrıntılar girilirken küçülür:
+    kişi sayısı, not alanı ve butonlar devreye girdiğinde karta kalan
+    yer (bkz. `--card-fit`) ikisine birden yetmiyordu.
+  */
+  const artwork = <RsvpArtwork src={image} compact={view.kind === "form"} />;
+
   if (view.kind === "saved") {
     return (
-      <RsvpSaved
-        rsvp={view.rsvp}
-        justSubmitted={view.justSubmitted}
-        onEdit={() => {
-          setError(null);
-          setView({ kind: "ask" });
-        }}
-      />
+      <div className="flex w-full flex-col items-center">
+        {artwork}
+        <RsvpSaved
+          rsvp={view.rsvp}
+          justSubmitted={view.justSubmitted}
+          onEdit={() => {
+            setError(null);
+            setView({ kind: "ask" });
+          }}
+        />
+      </div>
     );
   }
 
   if (view.kind === "ask") {
     return (
-      <div className="mt-12 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
-        <button
-          type="button"
-          onClick={() => setView({ kind: "form", status: "attending" })}
-          className="w-full rounded-(--button-radius) bg-charcoal px-8 py-4 text-[0.7rem] tracking-[0.2em] text-ivory transition-opacity duration-300 hover:opacity-85 sm:w-auto"
-        >
-          EVET, KATILACAĞIM
-        </button>
-        <button
-          type="button"
-          onClick={() => setView({ kind: "form", status: "declined" })}
-          className="w-full rounded-(--button-radius) border border-charcoal/25 px-8 py-4 text-[0.7rem] tracking-[0.2em] text-graphite transition-colors duration-300 hover:border-charcoal/50 hover:text-charcoal sm:w-auto"
-        >
-          NE YAZIK Kİ KATILAMAYACAĞIM
-        </button>
+      <div className="flex w-full flex-col items-center">
+        {artwork}
+        <div className="mt-10 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <button
+            type="button"
+            onClick={() => setView({ kind: "form", status: "attending" })}
+            className="w-full rounded-(--button-radius) bg-charcoal px-8 py-4 text-[0.7rem] tracking-[0.2em] text-ivory transition-opacity duration-300 hover:opacity-85 sm:w-auto"
+          >
+            EVET, KATILACAĞIM
+          </button>
+          <button
+            type="button"
+            onClick={() => setView({ kind: "form", status: "declined" })}
+            className="w-full rounded-(--button-radius) border border-charcoal/25 px-8 py-4 text-[0.7rem] tracking-[0.2em] text-graphite transition-colors duration-300 hover:border-charcoal/50 hover:text-charcoal sm:w-auto"
+          >
+            NE YAZIK Kİ KATILAMAYACAĞIM
+          </button>
+        </div>
       </div>
     );
   }
@@ -113,52 +133,90 @@ export function RsvpForm({ guest }: { guest: RsvpFormGuest }) {
   const attending = view.status === "attending";
 
   return (
-    <div className="mt-12 flex w-full flex-col items-center">
-      {attending ? (
-        <PeopleStepper
-          value={count}
-          max={guest.invitationLimit}
-          disabled={isPending}
-          onChange={setCount}
-        />
-      ) : (
-        <p className="text-balance text-sm leading-loose text-graphite">
-          Bildirdiğiniz için teşekkür ederiz. Dilerseniz bir not
-          bırakabilirsiniz.
-        </p>
-      )}
+    <div className="flex w-full flex-col items-center">
+      {artwork}
 
-      <NoteField value={note} disabled={isPending} onChange={setNote} />
+      <div className="mt-6 flex w-full flex-col items-center">
+        {attending ? (
+          <PeopleStepper
+            value={count}
+            max={guest.invitationLimit}
+            disabled={isPending}
+            onChange={setCount}
+          />
+        ) : (
+          <p className="text-balance text-sm leading-loose text-graphite">
+            Bildirdiğiniz için teşekkür ederiz. Dilerseniz bir not
+            bırakabilirsiniz.
+          </p>
+        )}
 
-      {error ? (
-        <p role="alert" className="mt-6 text-sm text-status-pending">
-          {error}
-        </p>
-      ) : null}
+        <NoteField value={note} disabled={isPending} onChange={setNote} />
 
-      <div className="mt-10 flex w-full flex-col items-center gap-4">
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={() => send(view.status)}
-          className="w-full rounded-(--button-radius) bg-charcoal px-8 py-4 text-[0.7rem] tracking-[0.2em] text-ivory transition-opacity duration-300 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56"
-        >
-          {isPending ? "GÖNDERİLİYOR…" : "GÖNDER"}
-        </button>
+        {error ? (
+          <p role="alert" className="mt-6 text-sm text-status-pending">
+            {error}
+          </p>
+        ) : null}
 
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={() => {
-            setError(null);
-            setView({ kind: "ask" });
-          }}
-          className="text-[0.7rem] tracking-[0.15em] text-stone underline-offset-4 transition-colors duration-300 hover:text-charcoal disabled:opacity-50"
-        >
-          GERİ
-        </button>
+        <div className="mt-6 flex w-full flex-col items-center gap-4">
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => send(view.status)}
+            className="w-full rounded-(--button-radius) bg-charcoal px-8 py-4 text-[0.7rem] tracking-[0.2em] text-ivory transition-opacity duration-300 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56"
+          >
+            {isPending ? "GÖNDERİLİYOR…" : "GÖNDER"}
+          </button>
+
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => {
+              setError(null);
+              setView({ kind: "ask" });
+            }}
+            className="text-[0.7rem] tracking-[0.15em] text-stone underline-offset-4 transition-colors duration-300 hover:text-charcoal disabled:opacity-50"
+          >
+            GERİ
+          </button>
+        </div>
       </div>
     </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Soruyu soran çizim.
+ *
+ * `next/image` kullanılmaz: çizimler kendi en–boy oranlarını korumalı,
+ * yalnızca üst sınır verilir (bkz. `ArtworkPanel`).
+ */
+function RsvpArtwork({
+  src,
+  compact,
+}: {
+  src?: string | null;
+  compact: boolean;
+}) {
+  if (!src) return null;
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt="Aramızda olacak mısınız?"
+      loading="lazy"
+      decoding="async"
+      className={cn(
+        "mb-2 h-auto w-auto max-w-full object-contain transition-[max-height] duration-500",
+        compact
+          ? "max-h-[min(calc(var(--card-fit)*0.24),9rem)]"
+          : "max-h-[min(calc(var(--card-fit)*0.45),16rem)]",
+      )}
+    />
   );
 }
 
@@ -191,7 +249,7 @@ function PeopleStepper({
         Kaç kişi katılacaksınız?
       </p>
 
-      <div className="mt-6 flex items-center gap-6">
+      <div className="mt-4 flex items-center gap-6">
         <StepperButton
           label="Bir kişi azalt"
           disabled={disabled || value <= 1}
@@ -217,7 +275,7 @@ function PeopleStepper({
         </StepperButton>
       </div>
 
-      <p className="mt-4 text-xs text-stone">
+      <p className="mt-2 text-xs text-stone">
         Sizin için {max} kişilik yer ayrıldı.
       </p>
     </div>
@@ -258,7 +316,7 @@ function NoteField({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="mt-12 w-full max-w-sm text-left">
+    <div className="mt-6 w-full max-w-sm text-left">
       <label
         htmlFor="rsvp-note"
         className="block text-[0.7rem] tracking-[0.15em] text-stone"
@@ -297,7 +355,7 @@ function RsvpSaved({
   const attending = rsvp.status === "attending";
 
   return (
-    <div className="mt-12 flex w-full flex-col items-center text-center">
+    <div className="mt-10 flex w-full flex-col items-center text-center">
       {justSubmitted ? (
         attending ? (
           <>

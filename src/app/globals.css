@@ -236,12 +236,16 @@ body {
   --card-header: 3.25rem;
   /* Yığılan başlıkların ekranın en tepesine yapışmaması için üst pay. */
   --stack-gap: 0.75rem;
+  /* Kart gövdesinin dikey dolgusu. Alçak ekranlarda kısalır: sabit
+     kalsaydı içeriğe kalan yerin çoğunu boşluk yerdi. */
+  --card-pad: clamp(2rem, 6svh, 3.5rem);
 }
 
 @media (min-width: 640px) {
   .card-stack {
     --card-header: 3.75rem;
     --stack-gap: 1.25rem;
+    --card-pad: clamp(2.25rem, 6svh, 4.5rem);
   }
 }
 
@@ -257,11 +261,41 @@ body {
 
 .card-stack > section {
   --enter: 1;
+
+  /*
+     Kart yapıştıktan sonra ekranda ona kalan yer: üstte biriken
+     başlıklar, altında ise bir sonraki kartın gireceği pay düşülür.
+     Kart bundan uzun olursa alt kısmı sonraki kartın altında kalır ve
+     hiçbir kaydırma noktasında görünmez — bu yüzden yükseklik buraya
+     kadardır, taşan içerik kartın *içinde* kaydırılır.
+
+     `--pin-top` kartın yapıştığı üst konumdur; sırasına bağlı olduğu
+     için `CardStack` tarafından satır içinde yazılır.
+  */
+  --card-room: calc(100svh - var(--pin-top) - var(--stack-gap));
+  /* İçeriğe kalan yükseklik: başlık şeridi ve gövde dolgusu düşülmüş hali. */
+  --card-fit: calc(var(--card-room) - var(--card-header) - 2 * var(--card-pad));
+
+  max-height: var(--card-room);
   box-shadow: 0 calc(2px + 10px * var(--enter)) calc(16px + 30px * var(--enter))
     rgb(42 39 36 / calc(0.03 + 0.05 * var(--enter)));
 }
 
+.card-body {
+  padding-block: var(--card-pad);
+  /* Kısa içerikli kartlar da nefes alsın; ama karta kalan yeri aşmasın. */
+  min-height: min(62svh, max(0px, calc(var(--card-room) - var(--card-header))));
+  overflow-y: auto;
+}
+
+/*
+   Ortalama `margin: auto` ile yapılır, `align-items/justify-content: center`
+   ile değil: ortalanan bir flex öğesi kabından taşınca üst tarafı kaydırma
+   erişiminin dışında kalır. Otomatik kenar boşlukları yer kalmadığında
+   sıfırlanır, içerik başa yaslanır ve tamamı kaydırılabilir olur.
+*/
 .card-content {
+  margin: auto;
   opacity: calc(0.1 + 0.9 * var(--enter));
   transform: translateY(calc((1 - var(--enter)) * 1.75rem));
 }

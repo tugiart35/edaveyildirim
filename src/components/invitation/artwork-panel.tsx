@@ -13,7 +13,9 @@ import type { InvitationPanel } from "@/types";
  * boyutlandırmasını kullanır: yalnızca üst sınırlar verilir.
  *
  * Yükseklik sınırı önemlidir: kart bir ekranı aşarsa yığılma akışı
- * okunmaz hale gelir.
+ * okunmaz hale gelir. Sınır sabit bir `vh` değil `--card-fit`'tir — kartın
+ * sırası derinleştikçe üstte biriken başlıklar yüzünden ona kalan yer
+ * azalır; çizim de o kadar küçülür.
  */
 export function ArtworkPanel({
   panel,
@@ -31,7 +33,7 @@ export function ArtworkPanel({
           alt={panel.label}
           loading="lazy"
           decoding="async"
-          className="h-auto w-auto max-h-[min(62vh,38rem)] max-w-full object-contain"
+          className="h-auto w-auto max-h-[min(var(--card-fit),38rem)] max-w-full object-contain"
         />
 
         {/*

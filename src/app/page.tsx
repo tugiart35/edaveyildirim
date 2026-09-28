@@ -39,7 +39,7 @@ export default async function HomePage() {
               alt="Aramızda olacak mısınız?"
               loading="lazy"
               decoding="async"
-              className="h-auto w-auto max-h-[min(34vh,18rem)] max-w-full object-contain"
+              className="h-auto w-auto max-h-[min(var(--card-fit),24rem)] max-w-full object-contain"
             />
           ) : (
             <h3 className="type-display text-3xl text-charcoal sm:text-4xl">

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode, RefObject } from "react";
+import type { CSSProperties, ReactNode, RefObject } from "react";
 import { useEffect, useRef } from "react";
 
 import { computeStackFrame } from "@/lib/stack/stack-frame";
@@ -27,6 +27,12 @@ export interface StackCard {
  * şeridi görünür kalır. Sayfa aşağı akan bir landing page değil,
  * ilerledikçe biriken bir deste gibi okunur.
  *
+ * Bir kart yapıştıktan sonra ekranda ona kalan yer sabittir: altındaki
+ * boşluğa bir sonraki kart oturur. Bu yüzden kart yüksekliği o pay ile
+ * sınırlanır (`--card-room`) ve sığmayan içerik kartın içinde kaydırılır;
+ * aksi halde uzun bir kartın alt kısmı sonraki kartın altında kalıp hiçbir
+ * kaydırma noktasında görünmüyordu.
+ *
  * Dikkat: yapışkan öğenin kendisine `transform` uygulanmaz — hareket
  * kart *içeriğine* verilir (bkz. `.card-content`), aksi halde sticky
  * davranışı riske girer. Aynı nedenle atalarda `overflow: hidden` yoktur.
@@ -46,13 +52,16 @@ export function CardStack({ cards }: { cards: StackCard[] }) {
           key={card.id}
           id={card.id}
           aria-labelledby={`${card.id}-label`}
-          className="sticky mx-auto mb-4 max-w-5xl overflow-hidden rounded-(--card-radius) border border-beige bg-warm-white sm:mb-5"
-          style={{
-            top: `calc(${index} * var(--card-header) + var(--stack-gap))`,
-            zIndex: index + 1,
-          }}
+          className="sticky mx-auto mb-4 flex max-w-5xl flex-col overflow-hidden rounded-(--card-radius) border border-beige bg-warm-white sm:mb-5"
+          style={
+            {
+              "--pin-top": `calc(${index} * var(--card-header) + var(--stack-gap))`,
+              top: "var(--pin-top)",
+              zIndex: index + 1,
+            } as CSSProperties
+          }
         >
-          <header className="flex h-(--card-header) items-center justify-between gap-4 border-b border-beige px-6 sm:px-10">
+          <header className="flex h-(--card-header) shrink-0 items-center justify-between gap-4 border-b border-beige px-6 sm:px-10">
             <div className="flex min-w-0 items-center gap-3">
               <span
                 aria-hidden
@@ -81,7 +90,7 @@ export function CardStack({ cards }: { cards: StackCard[] }) {
             ) : null}
           </header>
 
-          <div className="flex min-h-[62svh] items-center justify-center px-6 py-14 sm:px-10 sm:py-20">
+          <div className="card-body flex flex-1 px-6 sm:px-10">
             <div
               className={
                 card.wide
