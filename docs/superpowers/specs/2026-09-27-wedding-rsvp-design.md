@@ -36,14 +36,14 @@ Public davetiye sayfası, kişiye özel token'lı davetiye, RSVP alma ve güncel
 
 | Katman | Seçim | Gerekçe |
 |---|---|---|
-| Framework | Next.js 15, App Router | Şartname §6 |
+| Framework | Next.js 16, App Router | Şartname §6 |
 | Dil | TypeScript (strict) | — |
 | Stil | Tailwind CSS v4 | — |
 | Admin UI | Elle yazılmış bileşenler + yerel `<dialog>` | Aşağıdaki nota bakın |
 | Public UI | Tamamen özel bileşenler | Şartname §45: generic SaaS görünümü olmamalı |
 | Veritabanı | Supabase Postgres | Şartname §6 |
 | Dosya | Supabase Storage, bucket `wedding-assets` | Şartname §37 |
-| Auth | Özel: bcrypt + `jose` JWT + httpOnly cookie | Tek admin için Supabase Auth'tan daha az parça |
+| Auth | Özel: `node:crypto` scrypt + HMAC imzalı cookie | Tek admin için Supabase Auth'tan daha az parça; ek bağımlılık yok |
 | Validasyon | Zod (paylaşılan şemalar) | Şartname §41 |
 | Mutasyon | Server Actions + `revalidatePath` | Şartname §54, §58 |
 | Animasyon | CSS + IntersectionObserver hook | Framer Motion'dan hafif; şartname §44 opsiyonel diyor |
@@ -73,7 +73,7 @@ Bu, şartname §39-40'ın uygulanış biçimidir ve projedeki en önemli yapısa
 
 - `/invite/[token]` yalnızca o token'a ait guest kaydını döner; başka davetli verisi sızmaz.
 - Guest listesi hiçbir public endpoint'ten erişilebilir değil.
-- `/admin/*` middleware ile korunur.
+- `/admin/*` `src/proxy.ts` ile korunur (Next.js 16'da `middleware` bu isme taşındı).
 - Token ve guest adı SEO metadata'sında yer almaz (şartname §38).
 - Secret'lar yalnızca `.env.local` içinde; repoya `.env.example` girer.
 
@@ -538,7 +538,7 @@ Server Actions ilk günden kullanılır. Yani RSVP gerçekten kalıcı olarak ka
 | **4** | Admin layout + sidebar + login ekranı (UI, geçici doğrulama) | `/admin` gezinilebiliyor |
 | **5** | Dashboard: `computeWeddingStats`, kartlar, yanıt oranı, breakdown + testler | Sayılar doğru, testler geçiyor |
 | **6** | Davetli yönetimi: CRUD, token, arama, filtre, link kopyala, WhatsApp, boş durum | Davetli eklenip kişisel link üretilebiliyor |
-| **7** | Settings: form, tema seçimi, galeri yönetimi, müzik | Panelden tüm içerik düzenlenebiliyor |
+| **7** | Settings: form, tema seçimi, galeri yönetimi, müzik | Panelden tüm içerik düzenlenebiliyor ✓ |
 
 ### 14.3 Backend fazı
 
@@ -576,10 +576,12 @@ Build veya lint hatalıyken proje tamamlanmış sayılmaz.
 | # | Şartname | Bu tasarım | Gerekçe |
 |---|---|---|---|
 | 1 | §21: `rsvps.status` `pending` içerir | `pending` satır olarak saklanmaz, türetilir | UNIQUE constraint ile upsert doğallaşır; hesaplar birebir aynı |
-| 2 | §6, §22: Supabase Auth | Özel bcrypt + JWT cookie | Tek admin için daha az parça; ileride Supabase Auth'a geçiş kolay |
+| 2 | §6, §22: Supabase Auth | Özel `node:crypto` scrypt + HMAC cookie | Tek admin için daha az parça, ek bağımlılık yok; ileride Supabase Auth'a geçiş kolay |
 | 3 | §51: `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yok | Tarayıcı Supabase'e hiç bağlanmıyor; anahtarı hiç yayınlamamak daha güvenli |
-| 4 | §44: Framer Motion önerisi | CSS + IntersectionObserver | Daha küçük bundle; mobil 4G hedefi (§59) |
+| 4 | §44: Framer Motion önerisi | CSS + kaydırmaya bağlı `--enter` ilerlemesi | Daha küçük bundle; mobil 4G hedefi (§59) |
 | 5 | §16: yetişkin/çocuk ayrımı | Şema alanları var, UI yok | Kapsam kararı |
 | 6 | §35: CSV import | Yok | Kapsam kararı |
 | 7 | §49: setup wizard | Yok | Settings sayfası aynı işlevi görüyor |
 | 8 | §3, §70: kod öncesi içerik formu | Placeholder içerikle başlanır | İçerik admin panelinden düzenlenebilir; geliştirme beklemez |
+| 9 | §6: shadcn/ui "mümkünse" | Elle yazılmış bileşenler + yerel `<dialog>` | Kendi jeton sistemimizle çakışırdı; tek karmaşık parça modal ve o tarayıcıdan geliyor |
+| 10 | §37: görseller Storage'dan | Frontend fazında dosya yolu elle yazılır | Yükleme Adım 11'de; form alanları aynı kalıp yanına buton alacak |

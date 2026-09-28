@@ -37,6 +37,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="tr"
       data-theme={wedding.theme}
+      // Yumuşak kaydırma bilinçli; Next.js rota geçişlerinde de
+      // korunması için bu işaret gerekiyor.
+      data-scroll-behavior="smooth"
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>

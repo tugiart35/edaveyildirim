@@ -1,7 +1,8 @@
+import Link from "next/link";
+
 import { AdminShell } from "@/components/admin/admin-shell";
+import { WeddingSettingsForm } from "@/components/admin/wedding-settings-form";
 import { getWedding } from "@/lib/data";
-import { formatLongDate } from "@/lib/utils/date";
-import { coupleTitle } from "@/lib/utils/wedding";
 
 /**
  * Admin sayfaları her istekte taze veriyle üretilir; panelin işi
@@ -14,29 +15,29 @@ export default async function SettingsPage() {
 
   return (
     <AdminShell>
-      <h1 className="type-display text-2xl text-charcoal">Düğün Bilgileri</h1>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="type-display text-2xl text-charcoal">
+            Düğün Bilgileri
+          </h1>
+          <p className="mt-1 text-sm text-graphite">
+            Buradaki değişiklikler davetiyeye anında yansır.
+          </p>
+        </div>
 
-      <dl className="mt-8 grid gap-px overflow-hidden rounded-(--card-radius) border border-beige bg-beige sm:grid-cols-2">
-        <Row term="Çift" value={coupleTitle(wedding)} />
-        <Row term="Tarih" value={formatLongDate(wedding.eventDate)} />
-        <Row term="Saat" value={wedding.eventTime} />
-        <Row term="Mekân" value={wedding.venueName} />
-        <Row term="Adres" value={wedding.venueAddress ?? "—"} />
-        <Row term="Tema" value={wedding.theme} />
-      </dl>
+        <Link
+          href="/"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="rounded-(--button-radius) border border-beige px-4 py-2.5 text-sm text-graphite transition-colors duration-200 hover:border-charcoal/30 hover:text-charcoal"
+        >
+          Davetiyeyi görüntüle ↗
+        </Link>
+      </div>
 
-      <p className="mt-6 text-sm leading-relaxed text-graphite">
-        Düzenleme formu, görsel yükleme ve tema seçimi Adım 7&rsquo;de gelecek.
-      </p>
+      <div className="mt-8 max-w-3xl">
+        <WeddingSettingsForm wedding={wedding} />
+      </div>
     </AdminShell>
-  );
-}
-
-function Row({ term, value }: { term: string; value: string }) {
-  return (
-    <div className="bg-warm-white px-5 py-4">
-      <dt className="text-xs text-stone">{term}</dt>
-      <dd className="mt-1 text-sm text-charcoal">{value}</dd>
-    </div>
   );
 }
