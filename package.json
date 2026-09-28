@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "reset-data": "rm -rf .data && echo 'Veritabani silindi. npm run seed ile yeniden olusturun.'",
     "hash-password": "node scripts/hash-password.mjs",
-    "seed": "node --experimental-strip-types scripts/seed.mjs"
+    "seed": "node --experimental-strip-types scripts/seed.mjs",
+    "apply-wedding": "node --experimental-strip-types scripts/apply-wedding.mjs"
   },
   "engines": {
     "node": ">=22.0.0"

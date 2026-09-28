@@ -1,0 +1,39 @@
+{
+  "brideName": "Eda",
+  "groomName": "Yıldırım",
+  "nameOrder": "bride_first",
+  "eventDate": "2026-10-18",
+  "eventTime": "17:00",
+  "timezone": "Europe/Istanbul",
+  "venueName": "Baben",
+  "venueAddress": "Çiftlik Mahallesi Diyar Çıkmazı, Çiftlik, Fatih Sultan Mehmet Caddesi No:1, 34830 Beykoz/İstanbul",
+  "mapsUrl": "https://maps.google.com/?q=Baben+Beykoz+istanbul",
+  "invitationText": "Bu özel günümüzde sizleri de aramızda görmekten mutluluk duyarız.",
+  "theme": "elegant",
+  "coverImage": "/design/kapak.jpg",
+  "rsvpImage": "/design/katilim.jpg",
+  "primaryImage": null,
+  "musicUrl": null,
+  "galleryImages": [],
+  "enableChildSplit": false,
+  "panels": [
+    {
+      "label": "Düğün",
+      "image": "/design/dugun.jpg",
+      "countdown": false,
+      "directions": true
+    },
+    {
+      "label": "Program",
+      "image": "/design/program.jpg",
+      "countdown": false,
+      "directions": false
+    },
+    {
+      "label": "Geri Sayım",
+      "image": "/design/geri-sayim.jpg",
+      "countdown": true,
+      "directions": false
+    }
+  ]
+}
