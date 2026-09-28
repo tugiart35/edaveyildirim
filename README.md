@@ -126,8 +126,14 @@ derlenmez.
 | Alan | Değer |
 |---|---|
 | Type | Bind Mount |
-| Host Path | `../files/data` |
+| Host Path | `/etc/dokploy/applications/<uygulama-adı>/files/data` |
 | Mount Path | `/data` |
+
+> **Host Path mutlak olmalıdır.** Dokploy arayüzü `../files/data` gibi
+> göreli bir yolu kabul eder ama Docker Swarm bunu reddeder; servis
+> `Rejected` durumunda sonsuz döngüye girer, container hiç oluşmaz ve
+> Traefik 502 döner. Uygulama dizinini build log'undaki klonlama
+> yolundan öğrenebilirsin.
 
 Bu bir "ek disk" değil, VPS'in kendi diskindeki bir klasördür. Container
 dosya sistemi geçicidir: bağlanmazsa **her dağıtımda davetli listesi ve
@@ -156,6 +162,29 @@ giriş yapılamaz.
 Şema ve yer tutucu düğün kaydı ilk istekte oluşur. `/admin` adresinden
 girip **Düğün Bilgileri** sayfasından gerçek bilgileri yaz, sonra
 davetlileri ekle.
+
+
+### Sorun giderme
+
+**502 Bad Gateway**
+
+Traefik ayakta ama container'a ulaşamıyor demektir. Sırayla:
+
+1. `Domains` → **Container Port** `3000` mi?
+2. `Logs` → sağ üstteki **Swarm** anahtarını aç, sonra
+   `Select a container` menüsünü aç. Menü boşsa ya da görevler
+   `Rejected` görünüyorsa container hiç başlamamıştır.
+3. `Rejected` döngüsü neredeyse her zaman geçersiz mount demektir —
+   Host Path mutlak mı?
+
+Ayırt etmek için mount'u geçici olarak sil ve yeniden dağıt: site
+açılıyorsa sorun mount'taydı.
+
+**Derleme Node 18 ile başlıyor**
+
+Nixpacks sürümü `package.json` içindeki `engines.node` ve `.nvmrc`
+dosyasından okur. İkisi de bu depoda tanımlı; silinirlerse Nixpacks
+Node 18'e düşer ve Next.js 16 derlenmez.
 
 ---
 
