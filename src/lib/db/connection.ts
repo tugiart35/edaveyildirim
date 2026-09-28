@@ -5,6 +5,8 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
+import weddingConfig from "../../../config/wedding.json";
+
 import { SCHEMA_SQL } from "@/lib/db/schema";
 
 /**
@@ -47,14 +49,22 @@ export function getDatabase(): DatabaseSync {
 }
 
 /**
- * Boş bir veritabanına yer tutucu düğün kaydı koyar.
+ * Boş bir veritabanına düğün kaydını `config/wedding.json`'dan yazar.
  *
- * Uygulamanın her sayfası bir düğün kaydı olduğunu varsayar. Bu olmadan
- * taze kurulumda ilk istek hata verirdi; admin panele girip bilgileri
- * düzenleyemeden sıkışıp kalırdı.
+ * Uygulamanın her sayfası bir düğün kaydı olduğunu varsayar; bu olmadan
+ * taze kurulumda ilk istek hata verirdi.
  *
- * Değerler bilinçli olarak geneldir: admin `/admin/settings` üzerinden
- * kendi bilgilerini girer.
+ * Neden genel bir yer tutucu değil: sunucuda kalıcı disk bağlı değilse
+ * veritabanı her dağıtımda sıfırdan oluşur. Yer tutucu yazıldığında
+ * canlı site her deploy sonrası "Gelin & Damat" olarak açılıyor ve
+ * ayarların panelden yeniden girilmesi gerekiyordu. Artık davetiye
+ * doğrudan doğru içerikle geliyor.
+ *
+ * JSON içe aktarılır, diskten okunmaz: derlemede paketin içine gömülür,
+ * böylece standalone çıktıda dosyanın izlenip izlenmediğine bağlı
+ * kalmaz.
+ *
+ * Kayıt varsa dokunulmaz — panelden yapılan düzenlemeler korunur.
  */
 function ensureWedding(db: DatabaseSync): void {
   const { n } = db.prepare("SELECT COUNT(*) AS n FROM weddings").get() as {
@@ -64,19 +74,33 @@ function ensureWedding(db: DatabaseSync): void {
 
   const timestamp = new Date().toISOString();
 
-  // Bir yıl sonrası: geçerli bir tarih olmalı, ama gerçek tarih değil.
-  const placeholderDate = new Date();
-  placeholderDate.setFullYear(placeholderDate.getFullYear() + 1);
-
   db.prepare(
     `INSERT INTO weddings
-       (id, bride_name, groom_name, event_date, event_time, venue_name,
-        invitation_text, created_at, updated_at)
-     VALUES (?, 'Gelin', 'Damat', ?, '19:00', 'Mekân', ?, ?, ?)`,
+       (id, bride_name, groom_name, name_order, event_date, event_time,
+        timezone, venue_name, venue_address, maps_url, invitation_text,
+        theme, primary_image, cover_image, rsvp_image, gallery_images,
+        panels, music_url, enable_child_split, created_at, updated_at)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
   ).run(
     randomUUID(),
-    placeholderDate.toISOString().slice(0, 10),
-    "Bu özel günümüzde sizleri de aramızda görmekten mutluluk duyarız.",
+    weddingConfig.brideName,
+    weddingConfig.groomName,
+    weddingConfig.nameOrder,
+    weddingConfig.eventDate,
+    weddingConfig.eventTime,
+    weddingConfig.timezone,
+    weddingConfig.venueName,
+    weddingConfig.venueAddress,
+    weddingConfig.mapsUrl,
+    weddingConfig.invitationText,
+    weddingConfig.theme,
+    weddingConfig.primaryImage,
+    weddingConfig.coverImage,
+    weddingConfig.rsvpImage,
+    JSON.stringify(weddingConfig.galleryImages),
+    JSON.stringify(weddingConfig.panels),
+    weddingConfig.musicUrl,
+    weddingConfig.enableChildSplit ? 1 : 0,
     timestamp,
     timestamp,
   );
